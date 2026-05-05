@@ -1,0 +1,63 @@
+package model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Chat implements Subject {
+    private List<Message> chatHistory;
+    // Users involved in this chat
+    private List<User> participants;
+    private List<Observer> observers;
+
+    public Chat() {
+        this.chatHistory = new ArrayList<>();
+        this.participants = new ArrayList<>();
+        this.observers = new ArrayList<>();
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Notification notification) {
+        for (Observer observer : observers) {
+            observer.update(notification);
+        }
+    }
+
+    public void addParticipant(User user) {
+        if (!participants.contains(user)) {
+            participants.add(user);
+        }
+    }
+
+    public List<Message> getChatHistory() {
+        return chatHistory;
+    }
+
+    public void addMessage(Message message) {
+        this.chatHistory.add(message);
+        
+        Notification notification = new Notification("New Message", 
+            "New message from " + message.getSender().getName() + ": " + message.getText());
+        notifyObservers(notification);
+    }
+
+    public void sendMessage(Message message) {
+        addMessage(message);
+    }
+
+    // This method triggers notifications for all users in the chat (except the sender)
+    private void triggerNotification(Message message) {
+        // Now handled by the Server-side observer broadcast
+    }
+}
