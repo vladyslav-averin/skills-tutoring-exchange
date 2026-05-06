@@ -72,6 +72,7 @@ public class Main extends Application {
         primaryStage.setScene(loginScene);
         primaryStage.setTitle("Skills & Tutoring Exchange");
         primaryStage.sizeToScene();
+        primaryStage.centerOnScreen();
     }
 
     private void openStudentDashboard(Stage primaryStage) throws IOException {
@@ -90,6 +91,7 @@ public class Main extends Application {
         primaryStage.setScene(dashScene);
         primaryStage.setTitle("Skills & Tutoring Exchange - Dashboard");
         primaryStage.sizeToScene();
+        primaryStage.centerOnScreen();
     }
 
     private void openAdminDashboard(Stage primaryStage) throws IOException {
@@ -108,6 +110,7 @@ public class Main extends Application {
         primaryStage.setScene(adminScene);
         primaryStage.setTitle("Skills & Tutoring Exchange - Admin");
         primaryStage.sizeToScene();
+        primaryStage.centerOnScreen();
     }
 
     private void logout(Stage primaryStage) {
