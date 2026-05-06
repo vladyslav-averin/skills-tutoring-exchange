@@ -20,7 +20,7 @@
                </font>
             </Label>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" text="Open Chat Room">
+            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" text="Chat History">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

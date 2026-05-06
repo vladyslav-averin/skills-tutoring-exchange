@@ -106,6 +106,9 @@ public class ClientHandler implements Runnable {
                 User currentUser = (User) chatUsers[0];
                 User chatPartner = (User) chatUsers[1];
                 return new Response(true, "Direct chat history retrieved", chatDAO.getDirectChatHistory(currentUser, chatPartner));
+            case "GET_CHAT_PARTNERS":
+                User userForChatHistory = (User) request.getPayload();
+                return new Response(true, "Chat partners retrieved", chatDAO.getChatPartners(userForChatHistory));
             case "SEND_MESSAGE":
                 Message message = (Message) request.getPayload();
                 boolean messageSaved = chatDAO.saveMessage(message);

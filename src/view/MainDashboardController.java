@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
+import viewmodel.ChatHistoryViewModel;
 import viewmodel.ChatViewModel;
 import viewmodel.DashboardViewModel;
 import java.io.IOException;
@@ -70,17 +71,17 @@ public class MainDashboardController {
     @FXML
     public void onOpenChatButton() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatHistoryView.fxml"));
             Parent root = loader.load();
             
-            ChatViewModel chatViewModel = new ChatViewModel(viewModel.getModel());
-            ChatViewController controller = loader.getController();
-            controller.init(chatViewModel);
+            ChatHistoryViewModel chatHistoryViewModel = new ChatHistoryViewModel(viewModel.getModel());
+            ChatHistoryController controller = loader.getController();
+            controller.init(chatHistoryViewModel);
             
-            Stage chatStage = new Stage();
-            chatStage.setTitle("Global Chat Room");
-            chatStage.setScene(new Scene(root));
-            chatStage.show();
+            Stage chatHistoryStage = new Stage();
+            chatHistoryStage.setTitle("Chat History");
+            chatHistoryStage.setScene(new Scene(root));
+            chatHistoryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

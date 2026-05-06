@@ -131,4 +131,40 @@ public class ChatDAO {
         }
         return history;
     }
+
+    public List<model.User> getChatPartners(model.User user) {
+        List<model.User> partners = new ArrayList<>();
+        String sql = "SELECT DISTINCT partner_name FROM (" +
+                "SELECT receiver.name AS partner_name " +
+                "FROM messages m " +
+                "JOIN users sender ON m.sender_id = sender.id " +
+                "JOIN users receiver ON m.receiver_id = receiver.id " +
+                "WHERE sender.name = ? " +
+                "UNION " +
+                "SELECT sender.name AS partner_name " +
+                "FROM messages m " +
+                "JOIN users sender ON m.sender_id = sender.id " +
+                "JOIN users receiver ON m.receiver_id = receiver.id " +
+                "WHERE receiver.name = ?" +
+                ") chat_partners ORDER BY partner_name";
+
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try {
+            ensureReceiverColumn();
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, user.getName());
+                pstmt.setString(2, user.getName());
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        partners.add(new Student(rs.getString("partner_name"), ""));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching chat partners.");
+            e.printStackTrace();
+        }
+        return partners;
+    }
 }

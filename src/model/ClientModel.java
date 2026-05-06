@@ -57,6 +57,10 @@ public class ClientModel {
         networkClient.sendRequest(new Request("GET_DIRECT_CHAT_HISTORY", payload));
     }
 
+    public void fetchChatPartners() {
+        networkClient.sendRequest(new Request("GET_CHAT_PARTNERS", currentUser));
+    }
+
     public void sendMessage(String text) {
         model.Message msg = new model.Message(currentUser, text);
         networkClient.sendRequest(new Request("SEND_MESSAGE", msg));

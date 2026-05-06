@@ -79,6 +79,8 @@ public class NetworkClient {
                             model.fireEvent("ChatHistoryRetrieved", null, response.getPayload());
                         } else if ("Direct chat history retrieved".equals(response.getMessage())) {
                             model.fireEvent("DirectChatHistoryRetrieved", null, response.getPayload());
+                        } else if ("Chat partners retrieved".equals(response.getMessage())) {
+                            model.fireEvent("ChatPartnersRetrieved", null, response.getPayload());
                         } else if ("Direct message sent".equals(response.getMessage())) {
                             model.fireEvent("DirectMessageSent", null, "SUCCESS");
                         } else if ("Failed to send direct message".equals(response.getMessage())) {

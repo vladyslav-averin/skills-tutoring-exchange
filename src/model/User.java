@@ -39,4 +39,9 @@ public abstract class User implements Serializable {
     public void receiveNotification(Notification notification) {
         this.notifications.add(notification);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
