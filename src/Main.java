@@ -42,7 +42,7 @@ public class Main extends Application {
                 MainDashboardController dashController = dashLoader.getController();
                 dashController.init(dashViewModel);
 
-                Scene dashScene = new Scene(dashRoot, 600, 500);
+                Scene dashScene = new Scene(dashRoot, 800, 600);
                 primaryStage.setScene(dashScene);
                 primaryStage.setTitle("Skills & Tutoring Exchange - Dashboard");
             } catch (IOException e) {

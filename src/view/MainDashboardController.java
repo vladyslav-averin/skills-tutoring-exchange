@@ -1,16 +1,20 @@
 package view;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import viewmodel.ChatHistoryViewModel;
@@ -49,6 +53,7 @@ public class MainDashboardController {
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         
         courseListView.setItems(viewModel.getCourseList());
+        courseListView.setCellFactory(listView -> createCourseCell());
         courseListView.getSelectionModel().selectedItemProperty().addListener((observable, oldCourse, newCourse) -> {
             viewModel.setSelectedCourse(newCourse);
         });
@@ -202,5 +207,89 @@ public class MainDashboardController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private ListCell<model.Course> createCourseCell() {
+        return new ListCell<>() {
+            private final VBox content = new VBox(4);
+            private final HBox header = new HBox(8);
+            private final Label nameLabel = new Label();
+            private final Label matchLabel = new Label("Match");
+            private final Label tutorLabel = new Label();
+            private final Label infoLabel = new Label();
+            private final Label tagsLabel = new Label();
+
+            {
+                HBox spacer = new HBox();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+                matchLabel.setStyle("-fx-background-color: #dff0d8; -fx-text-fill: #2e7d32; -fx-padding: 2 8 2 8; -fx-background-radius: 4;");
+                tutorLabel.setStyle("-fx-text-fill: #5d6d7e;");
+                infoLabel.setStyle("-fx-text-fill: #2f2f2f;");
+                tagsLabel.setStyle("-fx-text-fill: #7f8c8d;");
+
+                nameLabel.setWrapText(true);
+                infoLabel.setWrapText(true);
+                tagsLabel.setWrapText(true);
+
+                // Keep text inside the list instead of forcing a horizontal scrollbar.
+                content.maxWidthProperty().bind(courseListView.widthProperty().subtract(24));
+                header.maxWidthProperty().bind(courseListView.widthProperty().subtract(40));
+                nameLabel.maxWidthProperty().bind(courseListView.widthProperty().subtract(140));
+                infoLabel.maxWidthProperty().bind(courseListView.widthProperty().subtract(40));
+                tagsLabel.maxWidthProperty().bind(courseListView.widthProperty().subtract(40));
+
+                header.getChildren().addAll(nameLabel, spacer, matchLabel);
+                content.getChildren().addAll(header, tutorLabel, infoLabel, tagsLabel);
+                content.setPadding(new Insets(6, 8, 6, 8));
+            }
+
+            @Override
+            protected void updateItem(model.Course course, boolean empty) {
+                super.updateItem(course, empty);
+
+                if (empty || course == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                nameLabel.setText(safeText(course.getName()));
+                tutorLabel.setText("Tutor: " + getTutorName(course));
+                infoLabel.setText(safeText(course.getInformation()));
+
+                String tags = course.getTags();
+                if (tags == null || tags.isEmpty()) {
+                    tagsLabel.setText("");
+                    tagsLabel.setVisible(false);
+                    tagsLabel.setManaged(false);
+                } else {
+                    tagsLabel.setText("Tags: " + tags);
+                    tagsLabel.setVisible(true);
+                    tagsLabel.setManaged(true);
+                }
+
+                matchLabel.setVisible(course.matchesUserTags());
+                matchLabel.setManaged(course.matchesUserTags());
+
+                setText(null);
+                setGraphic(content);
+            }
+        };
+    }
+
+    private String getTutorName(model.Course course) {
+        if (course.getTutor() == null || course.getTutor().getName() == null) {
+            return "Unknown";
+        }
+        return course.getTutor().getName();
+    }
+
+    private String safeText(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text;
     }
 }
