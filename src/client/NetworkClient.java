@@ -67,6 +67,11 @@ public class NetworkClient {
                             model.fireEvent("RegisterResult", null, "FAILED");
                         } else if ("Courses retrieved".equals(response.getMessage())) {
                             model.fireEvent("CoursesRetrieved", null, response.getPayload());
+                        } else if ("User tags updated successfully".equals(response.getMessage())) {
+                            model.setCurrentUser((User) response.getPayload());
+                            model.fireEvent("UserTagsUpdated", null, "SUCCESS");
+                        } else if ("Failed to update user tags".equals(response.getMessage())) {
+                            model.fireEvent("UserTagsUpdated", null, "FAILED");
                         } else if ("Course added successfully".equals(response.getMessage())) {
                             model.fireEvent("CourseAdded", null, "SUCCESS");
                         } else if ("Failed to add course".equals(response.getMessage())) {

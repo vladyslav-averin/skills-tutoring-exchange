@@ -20,10 +20,15 @@ public class DatabaseInitializer {
                     "id SERIAL PRIMARY KEY, " +
                     "user_type VARCHAR(20) NOT NULL, " +
                     "name VARCHAR(100) NOT NULL, " +
-                    "password VARCHAR(100) NOT NULL" +
+                    "password VARCHAR(100) NOT NULL, " +
+                    "tags TEXT" +
                     ")";
             stmt.execute(createUsersTable);
             System.out.println("Table 'users' verified/created.");
+
+            // Old databases need this column because the users table may already exist
+            String addUserTagsColumn = "ALTER TABLE users ADD COLUMN IF NOT EXISTS tags TEXT";
+            stmt.execute(addUserTagsColumn);
 
             // 2. Create Courses Table
             // 1-to-many relationship: A tutor (student) provides many courses

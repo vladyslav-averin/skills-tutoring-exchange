@@ -9,6 +9,7 @@ public class Course implements Serializable {
     private String name;
     private String information;
     private String tags;
+    private boolean matchesUserTags;
     private Student tutor; // The student who provides the course
     private List<Student> enrolledStudents; // Students enrolled in the course
 
@@ -21,6 +22,7 @@ public class Course implements Serializable {
         this.name = name;
         this.information = information;
         setTags(tags);
+        this.matchesUserTags = false;
         this.tutor = tutor;
         this.enrolledStudents = new ArrayList<>();
     }
@@ -62,6 +64,14 @@ public class Course implements Serializable {
         }
     }
 
+    public boolean matchesUserTags() {
+        return matchesUserTags;
+    }
+
+    public void setMatchesUserTags(boolean matchesUserTags) {
+        this.matchesUserTags = matchesUserTags;
+    }
+
     public Student getTutor() {
         return tutor;
     }
@@ -88,6 +98,11 @@ public class Course implements Serializable {
     @Override
     public String toString() {
         String courseText = name + " (Tutor: " + tutor.getName() + ") - " + information;
+
+        // Matching courses are marked so students can see why they are at the top
+        if (matchesUserTags) {
+            courseText = "[Match] " + courseText;
+        }
 
         // Show tags only when the course has them
         if (tags != null && !tags.isEmpty()) {

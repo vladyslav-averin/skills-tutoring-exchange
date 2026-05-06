@@ -23,6 +23,7 @@ public class MainDashboardController {
 
     @FXML private Label welcomeLabel;
     @FXML private ListView<model.Course> courseListView;
+    @FXML private TextField userTagsField;
     @FXML private TextField courseNameField;
     @FXML private TextField courseInfoField;
     @FXML private TextField courseTagsField;
@@ -35,6 +36,7 @@ public class MainDashboardController {
 
         // Bindings
         welcomeLabel.textProperty().bind(viewModel.welcomeMessageProperty());
+        userTagsField.textProperty().bindBidirectional(viewModel.userTagsProperty());
         courseNameField.textProperty().bindBidirectional(viewModel.newCourseNameProperty());
         courseInfoField.textProperty().bindBidirectional(viewModel.newCourseInfoProperty());
         courseTagsField.textProperty().bindBidirectional(viewModel.newCourseTagsProperty());
@@ -47,6 +49,11 @@ public class MainDashboardController {
     @FXML
     public void onAddCourseButton() {
         viewModel.addCourse();
+    }
+
+    @FXML
+    public void onSaveTagsButton() {
+        viewModel.saveUserTags();
     }
 
     @FXML

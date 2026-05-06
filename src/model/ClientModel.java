@@ -39,6 +39,11 @@ public class ClientModel {
         networkClient.sendRequest(new Request("GET_COURSES", null));
     }
 
+    public void updateCurrentUserTags(String tags) {
+        currentUser.setTags(tags);
+        networkClient.sendRequest(new Request("UPDATE_USER_TAGS", currentUser));
+    }
+
     public void addCourse(model.Course course) {
         networkClient.sendRequest(new Request("ADD_COURSE", course));
     }

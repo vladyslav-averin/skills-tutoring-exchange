@@ -12,7 +12,7 @@ public class UserDAO {
 
     // Method to create/register a new user
     public boolean createUser(User user) {
-        String sql = "INSERT INTO users (user_type, name, password) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (user_type, name, password, tags) VALUES (?, ?, ?, ?)";
         Connection conn = DatabaseConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
@@ -22,6 +22,7 @@ public class UserDAO {
             pstmt.setString(1, userType);
             pstmt.setString(2, user.getName());
             pstmt.setString(3, user.getPassword());
+            pstmt.setString(4, user.getTags());
             
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -45,11 +46,15 @@ public class UserDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     String userType = rs.getString("user_type");
+                    User user;
                     if ("Administrator".equals(userType)) {
-                        return new Administrator(rs.getString("name"), rs.getString("password"));
+                        user = new Administrator(rs.getString("name"), rs.getString("password"));
                     } else {
-                        return new Student(rs.getString("name"), rs.getString("password"));
+                        user = new Student(rs.getString("name"), rs.getString("password"));
                     }
+                    // Tags are loaded with the user so matching can happen in the dashboard
+                    user.setTags(rs.getString("tags"));
+                    return user;
                 }
             }
         } catch (SQLException e) {
@@ -57,6 +62,24 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null; // Return null if authentication fails
+    }
+
+    public boolean updateUserTags(User user) {
+        String sql = "UPDATE users SET tags = ? WHERE name = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user.getTags());
+            pstmt.setString(2, user.getName());
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error updating user tags.");
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // Method to delete a user by name (useful for Admin)

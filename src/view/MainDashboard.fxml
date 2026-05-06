@@ -42,6 +42,12 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
+            <HBox spacing="10.0">
+               <children>
+                  <TextField fx:id="userTagsField" promptText="My Tags (e.g. java, sql)" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#onSaveTagsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="Save Tags" />
+               </children>
+            </HBox>
             <ListView fx:id="courseListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
             
             <HBox alignment="CENTER_RIGHT">

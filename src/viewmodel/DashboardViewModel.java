@@ -17,6 +17,7 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     // Properties for UI binding
     private StringProperty welcomeMessage;
+    private StringProperty userTags;
     private StringProperty newCourseName;
     private StringProperty newCourseInfo;
     private StringProperty newCourseTags;
@@ -29,6 +30,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     public DashboardViewModel(ClientModel model) {
         this.model = model;
         this.welcomeMessage = new SimpleStringProperty("Welcome, " + model.getCurrentUser().getName());
+        this.userTags = new SimpleStringProperty(model.getCurrentUser().getTags());
         this.newCourseName = new SimpleStringProperty("");
         this.newCourseInfo = new SimpleStringProperty("");
         this.newCourseTags = new SimpleStringProperty("");
@@ -40,6 +42,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model.addListener("CourseDeleted", this);
         this.model.addListener("CourseUpdated", this);
         this.model.addListener("CourseEnrolled", this);
+        this.model.addListener("UserTagsUpdated", this);
         this.model.addListener("NewNotification", this);
         
         // Fetch courses immediately when dashboard opens
@@ -106,6 +109,11 @@ public class DashboardViewModel implements PropertyChangeListener {
         statusMessage.set("Updating course...");
         model.updateCourse(updatedCourse);
     }
+
+    public void saveUserTags() {
+        statusMessage.set("Saving your tags...");
+        model.updateCurrentUserTags(userTags.get());
+    }
     
     public void refreshCourses() {
         statusMessage.set("Refreshing courses...");
@@ -113,6 +121,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     }
 
     public StringProperty welcomeMessageProperty() { return welcomeMessage; }
+    public StringProperty userTagsProperty() { return userTags; }
     public StringProperty newCourseNameProperty() { return newCourseName; }
     public StringProperty newCourseInfoProperty() { return newCourseInfo; }
     public StringProperty newCourseTagsProperty() { return newCourseTags; }
@@ -139,13 +148,58 @@ public class DashboardViewModel implements PropertyChangeListener {
         model.enrollCourse(course);
     }
 
+    private void showCoursesWithMatchesFirst(List<Course> courses) {
+        List<Course> matchingCourses = new java.util.ArrayList<>();
+        List<Course> otherCourses = new java.util.ArrayList<>();
+
+        for (Course course : courses) {
+            boolean matches = courseMatchesUserTags(course);
+            course.setMatchesUserTags(matches);
+
+            if (matches) {
+                matchingCourses.add(course);
+            } else {
+                otherCourses.add(course);
+            }
+        }
+
+        courseList.clear();
+        courseList.addAll(matchingCourses);
+        courseList.addAll(otherCourses);
+    }
+
+    private boolean courseMatchesUserTags(Course course) {
+        String studentTags = model.getCurrentUser().getTags();
+        String courseTags = course.getTags();
+
+        if (studentTags == null || studentTags.isEmpty() || courseTags == null || courseTags.isEmpty()) {
+            return false;
+        }
+
+        String[] studentTagList = studentTags.toLowerCase().split(",");
+        String[] courseTagList = courseTags.toLowerCase().split(",");
+
+        // A course matches when at least one student tag is found in the course tags
+        for (String studentTag : studentTagList) {
+            String cleanStudentTag = studentTag.trim();
+
+            for (String courseTag : courseTagList) {
+                String cleanCourseTag = courseTag.trim();
+                if (!cleanStudentTag.isEmpty() && cleanStudentTag.equals(cleanCourseTag)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         javafx.application.Platform.runLater(() -> {
             if ("CoursesRetrieved".equals(evt.getPropertyName())) {
                 List<Course> courses = (List<Course>) evt.getNewValue();
-                courseList.clear();
-                courseList.addAll(courses);
+                showCoursesWithMatchesFirst(courses);
                 statusMessage.set("Courses updated.");
             } else if ("CourseAdded".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
@@ -182,6 +236,13 @@ public class DashboardViewModel implements PropertyChangeListener {
                 } else {
                     statusMessage.set("Failed to enroll. Maybe already enrolled?");
                     courseForEnrollment = null;
+                }
+            } else if ("UserTagsUpdated".equals(evt.getPropertyName())) {
+                if ("SUCCESS".equals(evt.getNewValue())) {
+                    statusMessage.set("Your tags were saved.");
+                    model.fetchCourses();
+                } else {
+                    statusMessage.set("Failed to save your tags.");
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {
                 model.Notification notif = (model.Notification) evt.getNewValue();

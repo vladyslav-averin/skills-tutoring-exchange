@@ -79,6 +79,14 @@ public class ClientHandler implements Runnable {
                 }
             case "GET_COURSES":
                 return new Response(true, "Courses retrieved", courseDAO.getAllCourses());
+            case "UPDATE_USER_TAGS":
+                User userWithNewTags = (User) request.getPayload();
+                boolean tagsUpdated = userDAO.updateUserTags(userWithNewTags);
+                if (tagsUpdated) {
+                    return new Response(true, "User tags updated successfully", userWithNewTags);
+                } else {
+                    return new Response(false, "Failed to update user tags", null);
+                }
             case "ADD_COURSE":
                 Course newCourse = (Course) request.getPayload();
                 boolean courseAdded = courseDAO.addCourse(newCourse);
