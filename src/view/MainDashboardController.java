@@ -1,6 +1,8 @@
 package view;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -42,6 +44,20 @@ public class MainDashboardController {
     @FXML
     public void onEnrollButton() {
         model.Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
+        if (selectedCourse == null) {
+            viewModel.enrollInCourse(null);
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Registration");
+        confirmation.setHeaderText("Register for this course?");
+        confirmation.setContentText(selectedCourse.toString());
+
+        if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
         viewModel.enrollInCourse(selectedCourse);
     }
 
