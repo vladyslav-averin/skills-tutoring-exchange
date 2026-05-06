@@ -34,6 +34,7 @@ public class MainDashboardController {
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         
         courseListView.setItems(viewModel.getCourseList());
+        viewModel.setOnEnrollmentSuccess(() -> openTutorChat(viewModel.getLastEnrolledCourse()));
     }
 
     @FXML
@@ -78,6 +79,30 @@ public class MainDashboardController {
             
             Stage chatStage = new Stage();
             chatStage.setTitle("Global Chat Room");
+            chatStage.setScene(new Scene(root));
+            chatStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openTutorChat(model.Course course) {
+        if (course == null || course.getTutor() == null) {
+            return;
+        }
+
+        String tutorName = course.getTutor().getName();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatView.fxml"));
+            Parent root = loader.load();
+
+            ChatViewModel chatViewModel = new ChatViewModel(viewModel.getModel(), "Chat with " + tutorName);
+            ChatViewController controller = loader.getController();
+            controller.init(chatViewModel);
+
+            Stage chatStage = new Stage();
+            chatStage.setTitle("Chat with " + tutorName);
             chatStage.setScene(new Scene(root));
             chatStage.show();
         } catch (IOException e) {

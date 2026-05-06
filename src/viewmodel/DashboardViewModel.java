@@ -21,6 +21,9 @@ public class DashboardViewModel implements PropertyChangeListener {
     private StringProperty newCourseInfo;
     private StringProperty statusMessage;
     private ObservableList<Course> courseList;
+    private Course courseForEnrollment;
+    private Course lastEnrolledCourse;
+    private Runnable onEnrollmentSuccess;
 
     public DashboardViewModel(ClientModel model) {
         this.model = model;
@@ -67,6 +70,11 @@ public class DashboardViewModel implements PropertyChangeListener {
     public StringProperty statusMessageProperty() { return statusMessage; }
     public ObservableList<Course> getCourseList() { return courseList; }
     public ClientModel getModel() { return model; }
+    public Course getLastEnrolledCourse() { return lastEnrolledCourse; }
+
+    public void setOnEnrollmentSuccess(Runnable onEnrollmentSuccess) {
+        this.onEnrollmentSuccess = onEnrollmentSuccess;
+    }
 
     public void enrollInCourse(Course course) {
         if (course == null) {
@@ -78,6 +86,7 @@ public class DashboardViewModel implements PropertyChangeListener {
             return;
         }
         statusMessage.set("Enrolling in " + course.getName() + "...");
+        courseForEnrollment = course;
         model.enrollCourse(course);
     }
 
@@ -101,8 +110,14 @@ public class DashboardViewModel implements PropertyChangeListener {
             } else if ("CourseEnrolled".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Successfully enrolled in the course!");
+                    lastEnrolledCourse = courseForEnrollment;
+                    courseForEnrollment = null;
+                    if (onEnrollmentSuccess != null) {
+                        onEnrollmentSuccess.run();
+                    }
                 } else {
                     statusMessage.set("Failed to enroll. Maybe already enrolled?");
+                    courseForEnrollment = null;
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {
                 model.Notification notif = (model.Notification) evt.getNewValue();

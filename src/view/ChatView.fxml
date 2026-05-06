@@ -14,7 +14,7 @@
    <top>
       <HBox alignment="CENTER" style="-fx-background-color: #8e44ad; -fx-padding: 10;" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Global Chat Room" textFill="WHITE">
+            <Label fx:id="chatTitleLabel" text="Global Chat Room" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>

@@ -8,6 +8,7 @@ import viewmodel.ChatViewModel;
 
 public class ChatViewController {
 
+    @FXML private Label chatTitleLabel;
     @FXML private ListView<model.Message> messageListView;
     @FXML private TextField messageInputField;
     @FXML private Label chatStatusLabel;
@@ -18,6 +19,7 @@ public class ChatViewController {
         this.viewModel = viewModel;
 
         messageListView.setItems(viewModel.getMessageList());
+        chatTitleLabel.textProperty().bind(viewModel.chatTitleProperty());
         messageInputField.textProperty().bindBidirectional(viewModel.messageInputProperty());
         chatStatusLabel.textProperty().bind(viewModel.chatStatusProperty());
         

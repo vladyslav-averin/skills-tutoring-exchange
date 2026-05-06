@@ -16,12 +16,18 @@ public class ChatViewModel implements PropertyChangeListener {
     private ObservableList<Message> messageList;
     private StringProperty messageInput;
     private StringProperty chatStatus;
+    private StringProperty chatTitle;
 
     public ChatViewModel(ClientModel model) {
+        this(model, "Global Chat Room");
+    }
+
+    public ChatViewModel(ClientModel model, String chatTitle) {
         this.model = model;
         this.messageList = FXCollections.observableArrayList();
         this.messageInput = new SimpleStringProperty("");
-        this.chatStatus = new SimpleStringProperty("Connected to chat.");
+        this.chatTitle = new SimpleStringProperty(chatTitle);
+        this.chatStatus = new SimpleStringProperty("Connected to " + chatTitle + ".");
 
         this.model.addListener("ChatHistoryRetrieved", this);
         this.model.addListener("NewNotification", this); // To receive real-time messages
@@ -40,6 +46,7 @@ public class ChatViewModel implements PropertyChangeListener {
     public ObservableList<Message> getMessageList() { return messageList; }
     public StringProperty messageInputProperty() { return messageInput; }
     public StringProperty chatStatusProperty() { return chatStatus; }
+    public StringProperty chatTitleProperty() { return chatTitle; }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
