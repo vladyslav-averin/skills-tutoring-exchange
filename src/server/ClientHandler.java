@@ -101,6 +101,11 @@ public class ClientHandler implements Runnable {
                 }
             case "GET_CHAT_HISTORY":
                 return new Response(true, "Chat history retrieved", chatDAO.getChatHistory());
+            case "GET_DIRECT_CHAT_HISTORY":
+                Object[] chatUsers = (Object[]) request.getPayload();
+                User currentUser = (User) chatUsers[0];
+                User chatPartner = (User) chatUsers[1];
+                return new Response(true, "Direct chat history retrieved", chatDAO.getDirectChatHistory(currentUser, chatPartner));
             case "SEND_MESSAGE":
                 Message message = (Message) request.getPayload();
                 boolean messageSaved = chatDAO.saveMessage(message);
@@ -110,6 +115,15 @@ public class ClientHandler implements Runnable {
                     return new Response(true, "Message sent", null);
                 } else {
                     return new Response(false, "Failed to send message", null);
+                }
+            case "SEND_DIRECT_MESSAGE":
+                Message directMessage = (Message) request.getPayload();
+                boolean directMessageSaved = chatDAO.saveMessage(directMessage);
+                if (directMessageSaved) {
+                    ServerMain.getGlobalChat().addMessage(directMessage);
+                    return new Response(true, "Direct message sent", null);
+                } else {
+                    return new Response(false, "Failed to send direct message", null);
                 }
             default:
                 return new Response(false, "Unknown request type", null);

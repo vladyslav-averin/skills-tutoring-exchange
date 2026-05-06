@@ -97,7 +97,7 @@ public class MainDashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatView.fxml"));
             Parent root = loader.load();
 
-            ChatViewModel chatViewModel = new ChatViewModel(viewModel.getModel(), "Chat with " + tutorName);
+            ChatViewModel chatViewModel = new ChatViewModel(viewModel.getModel(), course.getTutor(), "Chat with " + tutorName);
             ChatViewController controller = loader.getController();
             controller.init(chatViewModel);
 

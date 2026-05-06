@@ -52,9 +52,19 @@ public class ClientModel {
         networkClient.sendRequest(new Request("GET_CHAT_HISTORY", null));
     }
 
+    public void fetchDirectChatHistory(User chatPartner) {
+        Object[] payload = {currentUser, chatPartner};
+        networkClient.sendRequest(new Request("GET_DIRECT_CHAT_HISTORY", payload));
+    }
+
     public void sendMessage(String text) {
         model.Message msg = new model.Message(currentUser, text);
         networkClient.sendRequest(new Request("SEND_MESSAGE", msg));
+    }
+
+    public void sendDirectMessage(User receiver, String text) {
+        model.Message msg = new model.Message(currentUser, receiver, text);
+        networkClient.sendRequest(new Request("SEND_DIRECT_MESSAGE", msg));
     }
 
     public void setCurrentUser(User currentUser) {

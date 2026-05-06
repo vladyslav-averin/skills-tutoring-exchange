@@ -52,12 +52,18 @@ public class DatabaseInitializer {
             String createMessagesTable = "CREATE TABLE IF NOT EXISTS messages (" +
                     "id SERIAL PRIMARY KEY, " +
                     "sender_id INT, " +
+                    "receiver_id INT, " +
                     "text TEXT NOT NULL, " +
                     "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                    "FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE" +
+                    "FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE" +
                     ")";
             stmt.execute(createMessagesTable);
             System.out.println("Table 'messages' verified/created.");
+
+            String addReceiverColumn = "ALTER TABLE messages " +
+                    "ADD COLUMN IF NOT EXISTS receiver_id INT REFERENCES users(id) ON DELETE CASCADE";
+            stmt.execute(addReceiverColumn);
 
             System.out.println("Database initialization completed successfully.");
 
