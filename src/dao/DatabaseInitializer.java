@@ -31,11 +31,16 @@ public class DatabaseInitializer {
                     "id SERIAL PRIMARY KEY, " +
                     "name VARCHAR(255) NOT NULL, " +
                     "information TEXT, " +
+                    "tags TEXT, " +
                     "tutor_id INT, " +
                     "FOREIGN KEY (tutor_id) REFERENCES users(id) ON DELETE CASCADE" +
                     ")";
             stmt.execute(createCoursesTable);
             System.out.println("Table 'courses' verified/created.");
+
+            // Old databases need this column because the courses table may already exist
+            String addTagsColumn = "ALTER TABLE courses ADD COLUMN IF NOT EXISTS tags TEXT";
+            stmt.execute(addTagsColumn);
 
             // 3. Create Enrollments Table (Many-to-Many relationship between Student and Course)
             String createEnrollmentsTable = "CREATE TABLE IF NOT EXISTS enrollments (" +

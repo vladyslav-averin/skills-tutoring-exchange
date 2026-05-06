@@ -25,7 +25,8 @@ public class CourseDAO {
     }
 
     public boolean addCourse(Course course) {
-        String sql = "INSERT INTO courses (name, information, tutor_id) VALUES (?, ?, ?)";
+        // Course tags are saved as one simple text field
+        String sql = "INSERT INTO courses (name, information, tags, tutor_id) VALUES (?, ?, ?, ?)";
         Connection conn = DatabaseConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -34,7 +35,8 @@ public class CourseDAO {
 
             pstmt.setString(1, course.getName());
             pstmt.setString(2, course.getInformation());
-            pstmt.setInt(3, tutorId);
+            pstmt.setString(3, course.getTags());
+            pstmt.setInt(4, tutorId);
             
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -48,7 +50,7 @@ public class CourseDAO {
 
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
-        String sql = "SELECT c.id, c.name, c.information, u.name AS tutor_name " +
+        String sql = "SELECT c.id, c.name, c.information, c.tags, u.name AS tutor_name " +
                      "FROM courses c JOIN users u ON c.tutor_id = u.id";
         
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -57,7 +59,8 @@ public class CourseDAO {
             
             while (rs.next()) {
                 Student dummyTutor = new Student(rs.getString("tutor_name"), "");
-                Course course = new Course(rs.getString("name"), rs.getString("information"), dummyTutor);
+                // We only need the tutor name here for showing the course in the UI
+                Course course = new Course(rs.getString("name"), rs.getString("information"), rs.getString("tags"), dummyTutor);
                 course.setId(rs.getInt("id"));
                 courses.add(course);
             }
@@ -97,7 +100,7 @@ public class CourseDAO {
 
     public List<Course> getRegisteredCourses(User currentUser) {
         List<Course> courses = new ArrayList<>();
-        String sql = "SELECT c.id, c.name, c.information, tutor.name AS tutor_name " +
+        String sql = "SELECT c.id, c.name, c.information, c.tags, tutor.name AS tutor_name " +
                 "FROM enrollments e " +
                 "JOIN courses c ON e.course_id = c.id " +
                 "JOIN users tutor ON c.tutor_id = tutor.id " +
@@ -112,7 +115,8 @@ public class CourseDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Student dummyTutor = new Student(rs.getString("tutor_name"), "");
-                    Course course = new Course(rs.getString("name"), rs.getString("information"), dummyTutor);
+                    // Registered courses use the same Course object as the main course list
+                    Course course = new Course(rs.getString("name"), rs.getString("information"), rs.getString("tags"), dummyTutor);
                     course.setId(rs.getInt("id"));
                     courses.add(course);
                 }
@@ -168,7 +172,7 @@ public class CourseDAO {
     }
 
     public boolean updateCourse(Course course, User currentUser) {
-        String sql = "UPDATE courses SET name = ?, information = ? WHERE id = ? AND tutor_id = ?";
+        String sql = "UPDATE courses SET name = ?, information = ?, tags = ? WHERE id = ? AND tutor_id = ?";
         Connection conn = DatabaseConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -177,8 +181,9 @@ public class CourseDAO {
 
             pstmt.setString(1, course.getName());
             pstmt.setString(2, course.getInformation());
-            pstmt.setInt(3, course.getId());
-            pstmt.setInt(4, tutorId);
+            pstmt.setString(3, course.getTags());
+            pstmt.setInt(4, course.getId());
+            pstmt.setInt(5, tutorId);
 
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;

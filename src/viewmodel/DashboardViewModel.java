@@ -19,6 +19,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     private StringProperty welcomeMessage;
     private StringProperty newCourseName;
     private StringProperty newCourseInfo;
+    private StringProperty newCourseTags;
     private StringProperty statusMessage;
     private ObservableList<Course> courseList;
     private Course courseForEnrollment;
@@ -30,6 +31,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.welcomeMessage = new SimpleStringProperty("Welcome, " + model.getCurrentUser().getName());
         this.newCourseName = new SimpleStringProperty("");
         this.newCourseInfo = new SimpleStringProperty("");
+        this.newCourseTags = new SimpleStringProperty("");
         this.statusMessage = new SimpleStringProperty("");
         this.courseList = FXCollections.observableArrayList();
 
@@ -56,7 +58,8 @@ public class DashboardViewModel implements PropertyChangeListener {
         }
 
         Student tutor = (Student) model.getCurrentUser();
-        Course newCourse = new Course(newCourseName.get(), newCourseInfo.get(), tutor);
+        // Tags are optional, so students can still add a course without them
+        Course newCourse = new Course(newCourseName.get(), newCourseInfo.get(), newCourseTags.get(), tutor);
         statusMessage.set("Adding course...");
         model.addCourse(newCourse);
     }
@@ -79,7 +82,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         model.deleteCourse(course);
     }
 
-    public void updateCourse(Course course, String newName, String newInformation) {
+    public void updateCourse(Course course, String newName, String newInformation, String newTags) {
         if (course == null) {
             statusMessage.set("Please select a course to edit.");
             return;
@@ -97,7 +100,8 @@ public class DashboardViewModel implements PropertyChangeListener {
             return;
         }
 
-        Course updatedCourse = new Course(newName, newInformation, course.getTutor());
+        // Keep the same course id so the database updates this exact course
+        Course updatedCourse = new Course(newName, newInformation, newTags, course.getTutor());
         updatedCourse.setId(course.getId());
         statusMessage.set("Updating course...");
         model.updateCourse(updatedCourse);
@@ -111,6 +115,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     public StringProperty welcomeMessageProperty() { return welcomeMessage; }
     public StringProperty newCourseNameProperty() { return newCourseName; }
     public StringProperty newCourseInfoProperty() { return newCourseInfo; }
+    public StringProperty newCourseTagsProperty() { return newCourseTags; }
     public StringProperty statusMessageProperty() { return statusMessage; }
     public ObservableList<Course> getCourseList() { return courseList; }
     public ClientModel getModel() { return model; }
@@ -147,6 +152,7 @@ public class DashboardViewModel implements PropertyChangeListener {
                     statusMessage.set("Course added successfully!");
                     newCourseName.set("");
                     newCourseInfo.set("");
+                    newCourseTags.set("");
                     model.fetchCourses(); // Refresh list automatically
                 } else {
                     statusMessage.set("Failed to add course.");

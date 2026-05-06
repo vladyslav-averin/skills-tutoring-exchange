@@ -8,13 +8,19 @@ public class Course implements Serializable {
     private int id;
     private String name;
     private String information;
+    private String tags;
     private Student tutor; // The student who provides the course
     private List<Student> enrolledStudents; // Students enrolled in the course
 
     public Course(String name, String information, Student tutor) {
+        this(name, information, "", tutor);
+    }
+
+    public Course(String name, String information, String tags, Student tutor) {
         this.id = -1;
         this.name = name;
         this.information = information;
+        setTags(tags);
         this.tutor = tutor;
         this.enrolledStudents = new ArrayList<>();
     }
@@ -43,6 +49,19 @@ public class Course implements Serializable {
         this.information = information;
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        // Keep tags as a simple text value, like "java, sql, oop"
+        if (tags == null) {
+            this.tags = "";
+        } else {
+            this.tags = tags.trim();
+        }
+    }
+
     public Student getTutor() {
         return tutor;
     }
@@ -68,6 +87,13 @@ public class Course implements Serializable {
 
     @Override
     public String toString() {
-        return name + " (Tutor: " + tutor.getName() + ") - " + information;
+        String courseText = name + " (Tutor: " + tutor.getName() + ") - " + information;
+
+        // Show tags only when the course has them
+        if (tags != null && !tags.isEmpty()) {
+            courseText += " [Tags: " + tags + "]";
+        }
+
+        return courseText;
     }
 }

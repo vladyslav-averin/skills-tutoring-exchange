@@ -1,5 +1,7 @@
 package server;
 
+import dao.DatabaseInitializer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,6 +19,9 @@ public class ServerMain implements Observer {
 
     public static void main(String[] args) {
         System.out.println("Starting Server on port " + PORT + "...");
+
+        // Make sure the database tables and new columns exist before clients connect
+        DatabaseInitializer.initializeDatabase();
         
         ServerMain serverInstance = new ServerMain();
         globalChat.addObserver(serverInstance);

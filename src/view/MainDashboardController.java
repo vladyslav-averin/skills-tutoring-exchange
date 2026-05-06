@@ -25,6 +25,7 @@ public class MainDashboardController {
     @FXML private ListView<model.Course> courseListView;
     @FXML private TextField courseNameField;
     @FXML private TextField courseInfoField;
+    @FXML private TextField courseTagsField;
     @FXML private Label statusLabel;
 
     private DashboardViewModel viewModel;
@@ -36,6 +37,7 @@ public class MainDashboardController {
         welcomeLabel.textProperty().bind(viewModel.welcomeMessageProperty());
         courseNameField.textProperty().bindBidirectional(viewModel.newCourseNameProperty());
         courseInfoField.textProperty().bindBidirectional(viewModel.newCourseInfoProperty());
+        courseTagsField.textProperty().bindBidirectional(viewModel.newCourseTagsProperty());
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         
         courseListView.setItems(viewModel.getCourseList());
@@ -91,7 +93,7 @@ public class MainDashboardController {
     public void onEditCourseButton() {
         model.Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
         if (selectedCourse == null) {
-            viewModel.updateCourse(null, "", "");
+            viewModel.updateCourse(null, "", "", "");
             return;
         }
 
@@ -102,14 +104,17 @@ public class MainDashboardController {
 
         TextField nameField = new TextField(selectedCourse.getName());
         TextField infoField = new TextField(selectedCourse.getInformation());
+        TextField tagsField = new TextField(selectedCourse.getTags());
 
         VBox content = new VBox(10);
-        content.getChildren().addAll(new Label("Course name"), nameField, new Label("Course info"), infoField);
+        // Tags stay in the same edit dialog as the other course details
+        content.getChildren().addAll(new Label("Course name"), nameField, new Label("Course info"), infoField,
+                new Label("Course tags"), tagsField);
         dialog.getDialogPane().setContent(content);
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            viewModel.updateCourse(selectedCourse, nameField.getText(), infoField.getText());
+            viewModel.updateCourse(selectedCourse, nameField.getText(), infoField.getText(), tagsField.getText());
         }
     }
 
