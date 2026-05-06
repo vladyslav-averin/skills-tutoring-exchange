@@ -5,16 +5,26 @@ import java.util.List;
 import java.io.Serializable;
 
 public class Course implements Serializable {
+    private int id;
     private String name;
     private String information;
     private Student tutor; // The student who provides the course
     private List<Student> enrolledStudents; // Students enrolled in the course
 
     public Course(String name, String information, Student tutor) {
+        this.id = -1;
         this.name = name;
         this.information = information;
         this.tutor = tutor;
         this.enrolledStudents = new ArrayList<>();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

@@ -2,6 +2,7 @@ package dao;
 
 import model.Course;
 import model.Student;
+import model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class CourseDAO {
             while (rs.next()) {
                 Student dummyTutor = new Student(rs.getString("tutor_name"), "");
                 Course course = new Course(rs.getString("name"), rs.getString("information"), dummyTutor);
+                course.setId(rs.getInt("id"));
                 courses.add(course);
             }
             
@@ -73,7 +75,10 @@ public class CourseDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             int studentId = getUserIdByName(student.getName());
-            int courseId = getCourseId(course.getName(), course.getTutor().getName());
+            int courseId = course.getId();
+            if (courseId == -1) {
+                courseId = getCourseId(course.getName(), course.getTutor().getName());
+            }
             
             if (studentId == -1 || courseId == -1) return false;
 
@@ -85,6 +90,27 @@ public class CourseDAO {
             
         } catch (SQLException e) {
             System.err.println("Error enrolling student.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteCourse(Course course, User currentUser) {
+        String sql = "DELETE FROM courses WHERE id = ? AND tutor_id = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int tutorId = getUserIdByName(currentUser.getName());
+            if (course.getId() == -1 || tutorId == -1) return false;
+
+            pstmt.setInt(1, course.getId());
+            pstmt.setInt(2, tutorId);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting course.");
             e.printStackTrace();
             return false;
         }

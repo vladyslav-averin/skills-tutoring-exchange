@@ -35,6 +35,7 @@ public class DashboardViewModel implements PropertyChangeListener {
 
         this.model.addListener("CoursesRetrieved", this);
         this.model.addListener("CourseAdded", this);
+        this.model.addListener("CourseDeleted", this);
         this.model.addListener("CourseEnrolled", this);
         this.model.addListener("NewNotification", this);
         
@@ -57,6 +58,24 @@ public class DashboardViewModel implements PropertyChangeListener {
         Course newCourse = new Course(newCourseName.get(), newCourseInfo.get(), tutor);
         statusMessage.set("Adding course...");
         model.addCourse(newCourse);
+    }
+
+    public void deleteCourse(Course course) {
+        if (course == null) {
+            statusMessage.set("Please select a course to delete.");
+            return;
+        }
+        if (!(model.getCurrentUser() instanceof Student)) {
+            statusMessage.set("Only Students can delete their own courses.");
+            return;
+        }
+        if (course.getTutor() == null || !course.getTutor().getName().equals(model.getCurrentUser().getName())) {
+            statusMessage.set("You can only delete courses you created.");
+            return;
+        }
+
+        statusMessage.set("Deleting course...");
+        model.deleteCourse(course);
     }
     
     public void refreshCourses() {
@@ -106,6 +125,13 @@ public class DashboardViewModel implements PropertyChangeListener {
                     model.fetchCourses(); // Refresh list automatically
                 } else {
                     statusMessage.set("Failed to add course.");
+                }
+            } else if ("CourseDeleted".equals(evt.getPropertyName())) {
+                if ("SUCCESS".equals(evt.getNewValue())) {
+                    statusMessage.set("Course deleted successfully!");
+                    model.fetchCourses();
+                } else {
+                    statusMessage.set("Failed to delete course.");
                 }
             } else if ("CourseEnrolled".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {

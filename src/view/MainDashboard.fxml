@@ -41,6 +41,11 @@
             
             <HBox alignment="CENTER_RIGHT">
                <children>
+                  <Button mnemonicParsing="false" onAction="#onDeleteCourseButton" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Delete My Course">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
                   <Button mnemonicParsing="false" onAction="#onEnrollButton" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Enroll in Selected Course" />
                </children>
             </HBox>

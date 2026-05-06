@@ -88,6 +88,16 @@ public class ClientHandler implements Runnable {
                 } else {
                     return new Response(false, "Failed to add course", null);
                 }
+            case "DELETE_COURSE":
+                Object[] deleteData = (Object[]) request.getPayload();
+                User userDeletingCourse = (User) deleteData[0];
+                Course courseToDelete = (Course) deleteData[1];
+                boolean courseDeleted = courseDAO.deleteCourse(courseToDelete, userDeletingCourse);
+                if (courseDeleted) {
+                    return new Response(true, "Course deleted successfully", courseToDelete);
+                } else {
+                    return new Response(false, "Failed to delete course", null);
+                }
             case "ENROLL_COURSE":
                 // Payload contains array [Student, Course]
                 Object[] enrollData = (Object[]) request.getPayload();

@@ -64,6 +64,26 @@ public class MainDashboardController {
     }
 
     @FXML
+    public void onDeleteCourseButton() {
+        model.Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
+        if (selectedCourse == null) {
+            viewModel.deleteCourse(null);
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Delete");
+        confirmation.setHeaderText("Delete this course?");
+        confirmation.setContentText(selectedCourse.toString());
+
+        if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        viewModel.deleteCourse(selectedCourse);
+    }
+
+    @FXML
     public void onRefreshButton() {
         viewModel.refreshCourses();
     }
