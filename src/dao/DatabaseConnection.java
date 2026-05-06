@@ -8,9 +8,10 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private Connection connection;
 
-    // Database configuration
-    // Defaulting to 'postgres' database since you didn't specify one. If you created a different one (like sep2_db), change this URL.
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+    // The project uses a separate PostgreSQL database to avoid mixing its tables with the default 'postgres' database or tables from other projects
+    // DatabaseInitializer creates the required tables, but the database itself must be created manually first: CREATE DATABASE skills_tutoring_exchange;
+    // Change USER and PASSWORD if your local PostgreSQL setup is different
+    private static final String URL = "jdbc:postgresql://localhost:5432/skills_tutoring_exchange";
     private static final String USER = "postgres";
     private static final String PASSWORD = "your_password_here";
 
