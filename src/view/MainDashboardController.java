@@ -9,6 +9,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +32,7 @@ public class MainDashboardController {
     @FXML private TextField userTagsField;
     @FXML private TextField searchField;
     @FXML private TextField courseNameField;
-    @FXML private TextField courseInfoField;
+    @FXML private TextArea courseInfoField;
     @FXML private TextField courseTagsField;
     @FXML private Button deleteCourseButton;
     @FXML private Button editCourseButton;
@@ -125,15 +126,18 @@ public class MainDashboardController {
         dialog.setTitle("Edit Course");
         dialog.setHeaderText("Edit your course");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setPrefWidth(460);
 
         TextField nameField = new TextField(selectedCourse.getName());
-        TextField infoField = new TextField(selectedCourse.getInformation());
         TextField tagsField = new TextField(selectedCourse.getTags());
+        TextArea infoField = new TextArea(selectedCourse.getInformation());
+        infoField.setWrapText(true);
+        infoField.setPrefRowCount(4);
 
         VBox content = new VBox(10);
         // Tags stay in the same edit dialog as the other course details
-        content.getChildren().addAll(new Label("Course name"), nameField, new Label("Course info"), infoField,
-                new Label("Course tags"), tagsField);
+        content.getChildren().addAll(new Label("Course name"), nameField, new Label("Course tags"), tagsField,
+                new Label("Course info"), infoField);
         dialog.getDialogPane().setContent(content);
 
         Optional<ButtonType> result = dialog.showAndWait();
