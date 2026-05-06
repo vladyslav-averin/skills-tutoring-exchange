@@ -10,6 +10,7 @@ import model.Student;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardViewModel implements PropertyChangeListener {
@@ -18,10 +19,12 @@ public class DashboardViewModel implements PropertyChangeListener {
     // Properties for UI binding
     private StringProperty welcomeMessage;
     private StringProperty userTags;
+    private StringProperty searchText;
     private StringProperty newCourseName;
     private StringProperty newCourseInfo;
     private StringProperty newCourseTags;
     private StringProperty statusMessage;
+    private ObservableList<Course> allCourses;
     private ObservableList<Course> courseList;
     private Course courseForEnrollment;
     private Course lastEnrolledCourse;
@@ -31,11 +34,16 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model = model;
         this.welcomeMessage = new SimpleStringProperty("Welcome, " + model.getCurrentUser().getName());
         this.userTags = new SimpleStringProperty(model.getCurrentUser().getTags());
+        this.searchText = new SimpleStringProperty("");
         this.newCourseName = new SimpleStringProperty("");
         this.newCourseInfo = new SimpleStringProperty("");
         this.newCourseTags = new SimpleStringProperty("");
         this.statusMessage = new SimpleStringProperty("");
+        this.allCourses = FXCollections.observableArrayList();
         this.courseList = FXCollections.observableArrayList();
+
+        // Search is local because the dashboard already has all loaded courses
+        this.searchText.addListener((observable, oldValue, newValue) -> applyCourseFilter());
 
         this.model.addListener("CoursesRetrieved", this);
         this.model.addListener("CourseAdded", this);
@@ -122,6 +130,7 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     public StringProperty welcomeMessageProperty() { return welcomeMessage; }
     public StringProperty userTagsProperty() { return userTags; }
+    public StringProperty searchTextProperty() { return searchText; }
     public StringProperty newCourseNameProperty() { return newCourseName; }
     public StringProperty newCourseInfoProperty() { return newCourseInfo; }
     public StringProperty newCourseTagsProperty() { return newCourseTags; }
@@ -148,9 +157,56 @@ public class DashboardViewModel implements PropertyChangeListener {
         model.enrollCourse(course);
     }
 
+    private void applyCourseFilter() {
+        List<Course> filteredCourses = new ArrayList<>();
+
+        for (Course course : allCourses) {
+            if (courseMatchesSearch(course)) {
+                filteredCourses.add(course);
+            }
+        }
+
+        // Matching courses still stay at the top after search is applied
+        showCoursesWithMatchesFirst(filteredCourses);
+
+        if (allCourses.isEmpty()) {
+            statusMessage.set("No courses available.");
+        } else if (filteredCourses.isEmpty()) {
+            statusMessage.set("No courses found.");
+        } else {
+            statusMessage.set("Courses updated.");
+        }
+    }
+
+    private boolean courseMatchesSearch(Course course) {
+        String search = searchText.get();
+        if (search == null || search.trim().isEmpty()) {
+            return true;
+        }
+
+        String lowerSearch = search.toLowerCase().trim();
+        String courseName = course.getName();
+        String courseInfo = course.getInformation();
+        String courseTags = course.getTags();
+        String tutorName = "";
+
+        if (course.getTutor() != null) {
+            tutorName = course.getTutor().getName();
+        }
+
+        if (courseName == null) courseName = "";
+        if (courseInfo == null) courseInfo = "";
+        if (courseTags == null) courseTags = "";
+        if (tutorName == null) tutorName = "";
+
+        // The search checks the course fields that students can see in the list
+        String courseText = courseName + " " + courseInfo + " " + courseTags + " " + tutorName;
+        return courseText.toLowerCase().contains(lowerSearch);
+    }
+
     private void showCoursesWithMatchesFirst(List<Course> courses) {
-        List<Course> matchingCourses = new java.util.ArrayList<>();
-        List<Course> otherCourses = new java.util.ArrayList<>();
+        List<Course> matchingCourses = new ArrayList<>();
+        List<Course> otherCourses = new ArrayList<>();
 
         for (Course course : courses) {
             boolean matches = courseMatchesUserTags(course);
@@ -199,8 +255,9 @@ public class DashboardViewModel implements PropertyChangeListener {
         javafx.application.Platform.runLater(() -> {
             if ("CoursesRetrieved".equals(evt.getPropertyName())) {
                 List<Course> courses = (List<Course>) evt.getNewValue();
-                showCoursesWithMatchesFirst(courses);
-                statusMessage.set("Courses updated.");
+                allCourses.clear();
+                allCourses.addAll(courses);
+                applyCourseFilter();
             } else if ("CourseAdded".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Course added successfully!");

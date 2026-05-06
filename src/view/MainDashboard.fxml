@@ -48,6 +48,7 @@
                   <Button mnemonicParsing="false" onAction="#onSaveTagsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="Save Tags" />
                </children>
             </HBox>
+            <TextField fx:id="searchField" promptText="Search Courses" />
             <ListView fx:id="courseListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
             
             <HBox alignment="CENTER_RIGHT">

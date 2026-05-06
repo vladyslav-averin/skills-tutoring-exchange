@@ -24,6 +24,7 @@ public class MainDashboardController {
     @FXML private Label welcomeLabel;
     @FXML private ListView<model.Course> courseListView;
     @FXML private TextField userTagsField;
+    @FXML private TextField searchField;
     @FXML private TextField courseNameField;
     @FXML private TextField courseInfoField;
     @FXML private TextField courseTagsField;
@@ -37,6 +38,7 @@ public class MainDashboardController {
         // Bindings
         welcomeLabel.textProperty().bind(viewModel.welcomeMessageProperty());
         userTagsField.textProperty().bindBidirectional(viewModel.userTagsProperty());
+        searchField.textProperty().bindBidirectional(viewModel.searchTextProperty());
         courseNameField.textProperty().bindBidirectional(viewModel.newCourseNameProperty());
         courseInfoField.textProperty().bindBidirectional(viewModel.newCourseInfoProperty());
         courseTagsField.textProperty().bindBidirectional(viewModel.newCourseTagsProperty());
