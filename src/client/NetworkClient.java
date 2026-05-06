@@ -83,6 +83,12 @@ public class NetworkClient {
                             model.fireEvent("CourseEnrolled", null, "SUCCESS");
                         } else if ("Failed to enroll or already enrolled".equals(response.getMessage())) {
                             model.fireEvent("CourseEnrolled", null, "FAILED");
+                        } else if ("Registered courses retrieved".equals(response.getMessage())) {
+                            model.fireEvent("RegisteredCoursesRetrieved", null, response.getPayload());
+                        } else if ("Registration canceled successfully".equals(response.getMessage())) {
+                            model.fireEvent("RegistrationCanceled", null, "SUCCESS");
+                        } else if ("Failed to cancel registration".equals(response.getMessage())) {
+                            model.fireEvent("RegistrationCanceled", null, "FAILED");
                         } else if ("Chat history retrieved".equals(response.getMessage())) {
                             model.fireEvent("ChatHistoryRetrieved", null, response.getPayload());
                         } else if ("Direct chat history retrieved".equals(response.getMessage())) {

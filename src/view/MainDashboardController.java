@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import viewmodel.ChatHistoryViewModel;
 import viewmodel.ChatViewModel;
 import viewmodel.DashboardViewModel;
+import viewmodel.RegistrationViewModel;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -131,6 +132,25 @@ public class MainDashboardController {
             chatHistoryStage.setTitle("Chat History");
             chatHistoryStage.setScene(new Scene(root));
             chatHistoryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void onOpenRegistrationsButton() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/RegistrationView.fxml"));
+            Parent root = loader.load();
+
+            RegistrationViewModel registrationViewModel = new RegistrationViewModel(viewModel.getModel());
+            RegistrationViewController controller = loader.getController();
+            controller.init(registrationViewModel);
+
+            Stage registrationStage = new Stage();
+            registrationStage.setTitle("My Registrations");
+            registrationStage.setScene(new Scene(root));
+            registrationStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

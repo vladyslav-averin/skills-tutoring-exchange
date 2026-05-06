@@ -119,6 +119,19 @@ public class ClientHandler implements Runnable {
                 } else {
                     return new Response(false, "Failed to enroll or already enrolled", null);
                 }
+            case "GET_REGISTERED_COURSES":
+                User userForRegistrations = (User) request.getPayload();
+                return new Response(true, "Registered courses retrieved", courseDAO.getRegisteredCourses(userForRegistrations));
+            case "CANCEL_REGISTRATION":
+                Object[] cancelData = (Object[]) request.getPayload();
+                User userCancelingRegistration = (User) cancelData[0];
+                Course courseToCancel = (Course) cancelData[1];
+                boolean registrationCanceled = courseDAO.cancelRegistration(courseToCancel, userCancelingRegistration);
+                if (registrationCanceled) {
+                    return new Response(true, "Registration canceled successfully", courseToCancel);
+                } else {
+                    return new Response(false, "Failed to cancel registration", null);
+                }
             case "GET_CHAT_HISTORY":
                 return new Response(true, "Chat history retrieved", chatDAO.getChatHistory());
             case "GET_DIRECT_CHAT_HISTORY":

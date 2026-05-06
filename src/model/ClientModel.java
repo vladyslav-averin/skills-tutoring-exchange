@@ -58,6 +58,15 @@ public class ClientModel {
         networkClient.sendRequest(new Request("ENROLL_COURSE", payload));
     }
 
+    public void fetchRegisteredCourses() {
+        networkClient.sendRequest(new Request("GET_REGISTERED_COURSES", currentUser));
+    }
+
+    public void cancelRegistration(model.Course course) {
+        Object[] payload = {currentUser, course};
+        networkClient.sendRequest(new Request("CANCEL_REGISTRATION", payload));
+    }
+
     public void fetchChatHistory() {
         networkClient.sendRequest(new Request("GET_CHAT_HISTORY", null));
     }

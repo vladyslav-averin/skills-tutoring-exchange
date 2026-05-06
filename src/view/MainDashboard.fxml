@@ -25,6 +25,11 @@
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
+            <Button mnemonicParsing="false" onAction="#onOpenRegistrationsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="My Registrations">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
             <Button mnemonicParsing="false" onAction="#onRefreshButton" style="-fx-background-color: #34495e; -fx-text-fill: white;" text="Refresh Courses" />
          </children>
       </HBox>

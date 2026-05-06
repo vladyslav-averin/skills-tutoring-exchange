@@ -95,6 +95,57 @@ public class CourseDAO {
         }
     }
 
+    public List<Course> getRegisteredCourses(User currentUser) {
+        List<Course> courses = new ArrayList<>();
+        String sql = "SELECT c.id, c.name, c.information, tutor.name AS tutor_name " +
+                "FROM enrollments e " +
+                "JOIN courses c ON e.course_id = c.id " +
+                "JOIN users tutor ON c.tutor_id = tutor.id " +
+                "JOIN users student ON e.student_id = student.id " +
+                "WHERE student.name = ? " +
+                "ORDER BY c.name";
+
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, currentUser.getName());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Student dummyTutor = new Student(rs.getString("tutor_name"), "");
+                    Course course = new Course(rs.getString("name"), rs.getString("information"), dummyTutor);
+                    course.setId(rs.getInt("id"));
+                    courses.add(course);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching registered courses.");
+            e.printStackTrace();
+        }
+        return courses;
+    }
+
+    public boolean cancelRegistration(Course course, User currentUser) {
+        String sql = "DELETE FROM enrollments WHERE student_id = ? AND course_id = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int studentId = getUserIdByName(currentUser.getName());
+            if (studentId == -1 || course.getId() == -1) return false;
+
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, course.getId());
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error canceling registration.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean deleteCourse(Course course, User currentUser) {
         String sql = "DELETE FROM courses WHERE id = ? AND tutor_id = ?";
         Connection conn = DatabaseConnection.getInstance().getConnection();
