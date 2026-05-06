@@ -3,7 +3,7 @@ package network;
 import java.io.Serializable;
 
 public class Request implements Serializable {
-    private String type; // e.g., "LOGIN", "REGISTER", "ADD_COURSE", "GET_COURSES", "SEND_MESSAGE"
+    private String type; // e.g., "LOGIN", "REGISTER", "ADD_COURSE", "GET_COURSES", "SEND_DIRECT_MESSAGE"
     private Object payload; // The actual data being sent (e.g., User object, Message object)
 
     public Request(String type, Object payload) {

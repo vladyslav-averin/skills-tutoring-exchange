@@ -56,8 +56,8 @@ public class Chat implements Subject {
         addMessage(message);
     }
 
-    // This method triggers notifications for all users in the chat (except the sender)
+    // Direct message notifications are now handled by the server socket that owns the receiver.
     private void triggerNotification(Message message) {
-        // Now handled by the Server-side observer broadcast
+        // Kept empty because this class only represents the chat domain object.
     }
 }

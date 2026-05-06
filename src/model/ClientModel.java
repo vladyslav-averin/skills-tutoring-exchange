@@ -72,10 +72,6 @@ public class ClientModel {
         networkClient.sendRequest(new Request("CANCEL_REGISTRATION", payload));
     }
 
-    public void fetchChatHistory() {
-        networkClient.sendRequest(new Request("GET_CHAT_HISTORY", null));
-    }
-
     public void fetchDirectChatHistory(User chatPartner) {
         Object[] payload = {currentUser, chatPartner};
         networkClient.sendRequest(new Request("GET_DIRECT_CHAT_HISTORY", payload));
@@ -83,11 +79,6 @@ public class ClientModel {
 
     public void fetchChatPartners() {
         networkClient.sendRequest(new Request("GET_CHAT_PARTNERS", currentUser));
-    }
-
-    public void sendMessage(String text) {
-        model.Message msg = new model.Message(currentUser, text);
-        networkClient.sendRequest(new Request("SEND_MESSAGE", msg));
     }
 
     public void sendDirectMessage(User receiver, String text) {

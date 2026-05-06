@@ -68,34 +68,6 @@ public class ChatDAO {
         }
     }
 
-    public List<Message> getChatHistory() {
-        List<Message> history = new ArrayList<>();
-        String sql = "SELECT m.text, m.timestamp, u.name AS sender_name " +
-                     "FROM messages m JOIN users u ON m.sender_id = u.id " +
-                     "WHERE m.receiver_id IS NULL " +
-                     "ORDER BY m.timestamp ASC";
-        
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        try {
-            ensureReceiverColumn();
-            try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-                while (rs.next()) {
-                    Student dummySender = new Student(rs.getString("sender_name"), "");
-                    Message msg = new Message(dummySender, rs.getString("text"));
-                    msg.setTimeStamp(rs.getTimestamp("timestamp").toLocalDateTime());
-                    history.add(msg);
-                }
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error fetching chat history.");
-            e.printStackTrace();
-        }
-        return history;
-    }
-
     public List<Message> getDirectChatHistory(model.User user, model.User chatPartner) {
         List<Message> history = new ArrayList<>();
         String sql = "SELECT m.text, m.timestamp, sender.name AS sender_name, receiver.name AS receiver_name " +

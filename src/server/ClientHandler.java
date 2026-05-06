@@ -5,6 +5,7 @@ import dao.CourseDAO;
 import dao.UserDAO;
 import model.Course;
 import model.Message;
+import model.Notification;
 import model.User;
 import network.Request;
 import network.Response;
@@ -21,6 +22,7 @@ public class ClientHandler implements Runnable {
     private UserDAO userDAO;
     private CourseDAO courseDAO;
     private ChatDAO chatDAO;
+    private User currentUser;
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
@@ -65,6 +67,9 @@ public class ClientHandler implements Runnable {
                 String[] credentials = (String[]) request.getPayload();
                 User loggedInUser = userDAO.authenticateUser(credentials[0], credentials[1]);
                 if (loggedInUser != null) {
+                    // Remember which logged-in user belongs to this socket.
+                    // The server uses this to send private notifications only to the right client.
+                    currentUser = loggedInUser;
                     return new Response(true, "Login successful", loggedInUser);
                 } else {
                     return new Response(false, "Invalid credentials", null);
@@ -140,8 +145,6 @@ public class ClientHandler implements Runnable {
                 } else {
                     return new Response(false, "Failed to cancel registration", null);
                 }
-            case "GET_CHAT_HISTORY":
-                return new Response(true, "Chat history retrieved", chatDAO.getChatHistory());
             case "GET_DIRECT_CHAT_HISTORY":
                 Object[] chatUsers = (Object[]) request.getPayload();
                 User currentUser = (User) chatUsers[0];
@@ -150,21 +153,17 @@ public class ClientHandler implements Runnable {
             case "GET_CHAT_PARTNERS":
                 User userForChatHistory = (User) request.getPayload();
                 return new Response(true, "Chat partners retrieved", chatDAO.getChatPartners(userForChatHistory));
-            case "SEND_MESSAGE":
-                Message message = (Message) request.getPayload();
-                boolean messageSaved = chatDAO.saveMessage(message);
-                if (messageSaved) {
-                    // Add message to global chat to trigger the Observer Pattern Notification broadcast
-                    ServerMain.getGlobalChat().addMessage(message);
-                    return new Response(true, "Message sent", null);
-                } else {
-                    return new Response(false, "Failed to send message", null);
-                }
             case "SEND_DIRECT_MESSAGE":
                 Message directMessage = (Message) request.getPayload();
                 boolean directMessageSaved = chatDAO.saveMessage(directMessage);
                 if (directMessageSaved) {
-                    ServerMain.getGlobalChat().addMessage(directMessage);
+                    // Direct chats are private, so only the receiver should get the notification.
+                    // The sender already gets the normal "Direct message sent" response below.
+                    if (directMessage.getReceiver() != null) {
+                        Notification notification = new Notification("New Message",
+                                "New message from " + directMessage.getSender().getName() + ": " + directMessage.getText());
+                        ServerMain.sendToUser(directMessage.getReceiver().getName(), notification);
+                    }
                     return new Response(true, "Direct message sent", null);
                 } else {
                     return new Response(false, "Failed to send direct message", null);
@@ -183,6 +182,13 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getCurrentUsername() {
+        if (currentUser == null) {
+            return null;
+        }
+        return currentUser.getName();
     }
 
     private void closeConnections() {

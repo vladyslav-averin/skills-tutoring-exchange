@@ -94,8 +94,6 @@ public class NetworkClient {
                             model.fireEvent("RegistrationCanceled", null, "SUCCESS");
                         } else if ("Failed to cancel registration".equals(response.getMessage())) {
                             model.fireEvent("RegistrationCanceled", null, "FAILED");
-                        } else if ("Chat history retrieved".equals(response.getMessage())) {
-                            model.fireEvent("ChatHistoryRetrieved", null, response.getPayload());
                         } else if ("Direct chat history retrieved".equals(response.getMessage())) {
                             model.fireEvent("DirectChatHistoryRetrieved", null, response.getPayload());
                         } else if ("Chat partners retrieved".equals(response.getMessage())) {

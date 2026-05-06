@@ -20,14 +20,6 @@ public class ChatViewModel implements PropertyChangeListener {
     private StringProperty chatTitle;
     private User chatPartner;
 
-    public ChatViewModel(ClientModel model) {
-        this(model, "Global Chat Room");
-    }
-
-    public ChatViewModel(ClientModel model, String chatTitle) {
-        this(model, null, chatTitle);
-    }
-
     public ChatViewModel(ClientModel model, User chatPartner, String chatTitle) {
         this.model = model;
         this.chatPartner = chatPartner;
@@ -36,7 +28,6 @@ public class ChatViewModel implements PropertyChangeListener {
         this.chatTitle = new SimpleStringProperty(chatTitle);
         this.chatStatus = new SimpleStringProperty("Connected to " + chatTitle + ".");
 
-        this.model.addListener("ChatHistoryRetrieved", this);
         this.model.addListener("DirectChatHistoryRetrieved", this);
         this.model.addListener("DirectMessageSent", this);
         this.model.addListener("NewNotification", this); // To receive real-time messages
@@ -49,17 +40,15 @@ public class ChatViewModel implements PropertyChangeListener {
             return;
         }
         if (chatPartner == null) {
-            model.sendMessage(messageInput.get());
-        } else {
-            model.sendDirectMessage(chatPartner, messageInput.get());
+            chatStatus.set("No chat partner selected.");
+            return;
         }
+        model.sendDirectMessage(chatPartner, messageInput.get());
         messageInput.set("");
     }
 
     private void fetchHistory() {
-        if (chatPartner == null) {
-            model.fetchChatHistory();
-        } else {
+        if (chatPartner != null) {
             model.fetchDirectChatHistory(chatPartner);
         }
     }
@@ -72,14 +61,7 @@ public class ChatViewModel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         javafx.application.Platform.runLater(() -> {
-            if ("ChatHistoryRetrieved".equals(evt.getPropertyName())) {
-                if (chatPartner == null) {
-                    List<Message> history = (List<Message>) evt.getNewValue();
-                    messageList.clear();
-                    messageList.addAll(history);
-                    chatStatus.set("Chat history loaded.");
-                }
-            } else if ("DirectChatHistoryRetrieved".equals(evt.getPropertyName())) {
+            if ("DirectChatHistoryRetrieved".equals(evt.getPropertyName())) {
                 if (chatPartner != null) {
                     List<Message> history = (List<Message>) evt.getNewValue();
                     messageList.clear();
@@ -95,14 +77,12 @@ public class ChatViewModel implements PropertyChangeListener {
                     }
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {
-                // When someone sends a message, Server broadcasts a Notification via Observer pattern.
-                // We should technically fetch the new message or the notification could contain the message.
-                // For simplicity, whenever there's a notification, we just re-fetch the history so it updates!
+                // The server sends this only to the receiver of a direct message.
+                // We reload this chat so the new message appears without reopening the window.
                 model.Notification notif = (model.Notification) evt.getNewValue();
                 if (notif.getTitle().equals("New Message")) {
                     fetchHistory();
                 } else {
-                    // It's a general notification, just re-fetch chat anyway to be safe
                     fetchHistory();
                 }
             }
