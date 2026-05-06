@@ -34,7 +34,7 @@ public class RegistrationViewController {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirm Cancel");
         confirmation.setHeaderText("Cancel this registration?");
-        confirmation.setContentText(selectedCourse.toString());
+        confirmation.setContentText(getCourseName(selectedCourse));
 
         if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
@@ -46,5 +46,12 @@ public class RegistrationViewController {
     @FXML
     public void onRefreshButton() {
         viewModel.refreshRegisteredCourses();
+    }
+
+    private String getCourseName(Course course) {
+        if (course == null || course.getName() == null) {
+            return "";
+        }
+        return course.getName();
     }
 }

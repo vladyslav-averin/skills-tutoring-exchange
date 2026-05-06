@@ -85,7 +85,7 @@ public class MainDashboardController {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirm Registration");
         confirmation.setHeaderText("Register for this course?");
-        confirmation.setContentText(selectedCourse.toString());
+        confirmation.setContentText(getCourseName(selectedCourse));
 
         if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
@@ -105,7 +105,7 @@ public class MainDashboardController {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirm Delete");
         confirmation.setHeaderText("Delete this course?");
-        confirmation.setContentText(selectedCourse.toString());
+        confirmation.setContentText(getCourseName(selectedCourse));
 
         if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
@@ -288,6 +288,13 @@ public class MainDashboardController {
             return "Unknown";
         }
         return course.getTutor().getName();
+    }
+
+    private String getCourseName(model.Course course) {
+        if (course == null || course.getName() == null) {
+            return "";
+        }
+        return course.getName();
     }
 
     private String safeText(String text) {
