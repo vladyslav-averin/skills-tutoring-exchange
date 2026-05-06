@@ -2,6 +2,9 @@ package viewmodel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.paint.Paint;
 import model.ClientModel;
 
 import java.beans.PropertyChangeEvent;
@@ -14,6 +17,7 @@ public class LoginViewModel implements PropertyChangeListener {
     private StringProperty usernameProperty;
     private StringProperty passwordProperty;
     private StringProperty errorProperty;
+    private ObjectProperty<Paint> statusColor;
     private Runnable onLoginSuccess;
 
     public LoginViewModel(ClientModel model) {
@@ -21,6 +25,7 @@ public class LoginViewModel implements PropertyChangeListener {
         this.usernameProperty = new SimpleStringProperty("");
         this.passwordProperty = new SimpleStringProperty("");
         this.errorProperty = new SimpleStringProperty("");
+        this.statusColor = new SimpleObjectProperty<>(Paint.valueOf("#e74c3c"));
 
         // Listen for responses from the server via the Model
         this.model.addListener("LoginResult", this);
@@ -29,20 +34,20 @@ public class LoginViewModel implements PropertyChangeListener {
 
     public void login() {
         if (usernameProperty.get().isEmpty() || passwordProperty.get().isEmpty()) {
-            errorProperty.set("Please enter both username and password.");
+            showError("Please enter both username and password.");
             return;
         }
-        errorProperty.set("Connecting...");
+        showInfo("Connecting...");
         model.login(usernameProperty.get(), passwordProperty.get());
     }
 
-    public void register(String userType) {
+    public void registerStudent() {
         if (usernameProperty.get().isEmpty() || passwordProperty.get().isEmpty()) {
-            errorProperty.set("Please enter both username and password to register.");
+            showError("Please enter both username and password to register.");
             return;
         }
-        errorProperty.set("Registering...");
-        model.register(userType, usernameProperty.get(), passwordProperty.get());
+        showInfo("Registering...");
+        model.register("Student", usernameProperty.get(), passwordProperty.get());
     }
 
     public void setOnLoginSuccess(Runnable onLoginSuccess) {
@@ -52,6 +57,7 @@ public class LoginViewModel implements PropertyChangeListener {
     public StringProperty usernameProperty() { return usernameProperty; }
     public StringProperty passwordProperty() { return passwordProperty; }
     public StringProperty errorProperty() { return errorProperty; }
+    public ObjectProperty<Paint> statusColorProperty() { return statusColor; }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -62,20 +68,35 @@ public class LoginViewModel implements PropertyChangeListener {
         javafx.application.Platform.runLater(() -> {
             if ("LoginResult".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    errorProperty.set("Login Successful! Welcome " + model.getCurrentUser().getName());
+                    showSuccess("Login Successful! Welcome " + model.getCurrentUser().getName());
                     if (onLoginSuccess != null) {
                         onLoginSuccess.run();
                     }
                 } else {
-                    errorProperty.set("Invalid credentials. Try again.");
+                    showError("Invalid credentials. Try again.");
                 }
             } else if ("RegisterResult".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    errorProperty.set("Registration Successful! You can now login.");
+                    showSuccess("Registration Successful! You can now login.");
                 } else {
-                    errorProperty.set("Registration Failed.");
+                    showError("Registration Failed.");
                 }
             }
         });
+    }
+
+    private void showError(String message) {
+        statusColor.set(Paint.valueOf("#e74c3c"));
+        errorProperty.set(message);
+    }
+
+    private void showSuccess(String message) {
+        statusColor.set(Paint.valueOf("#27ae60"));
+        errorProperty.set(message);
+    }
+
+    private void showInfo(String message) {
+        statusColor.set(Paint.valueOf("#34495e"));
+        errorProperty.set(message);
     }
 }
