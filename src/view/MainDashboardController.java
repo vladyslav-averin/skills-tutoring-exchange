@@ -2,6 +2,7 @@ package view;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -28,6 +29,9 @@ public class MainDashboardController {
     @FXML private TextField courseNameField;
     @FXML private TextField courseInfoField;
     @FXML private TextField courseTagsField;
+    @FXML private Button deleteCourseButton;
+    @FXML private Button editCourseButton;
+    @FXML private Button enrollCourseButton;
     @FXML private Label statusLabel;
 
     private DashboardViewModel viewModel;
@@ -45,6 +49,12 @@ public class MainDashboardController {
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         
         courseListView.setItems(viewModel.getCourseList());
+        courseListView.getSelectionModel().selectedItemProperty().addListener((observable, oldCourse, newCourse) -> {
+            viewModel.setSelectedCourse(newCourse);
+        });
+        deleteCourseButton.disableProperty().bind(viewModel.canDeleteSelectedCourseProperty().not());
+        editCourseButton.disableProperty().bind(viewModel.canEditSelectedCourseProperty().not());
+        enrollCourseButton.disableProperty().bind(viewModel.canEnrollSelectedCourseProperty().not());
         viewModel.setOnEnrollmentSuccess(() -> openTutorChat(viewModel.getLastEnrolledCourse()));
     }
 

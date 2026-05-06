@@ -2,6 +2,8 @@ package viewmodel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.ClientModel;
@@ -11,7 +13,9 @@ import model.Student;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DashboardViewModel implements PropertyChangeListener {
     private ClientModel model;
@@ -24,8 +28,13 @@ public class DashboardViewModel implements PropertyChangeListener {
     private StringProperty newCourseInfo;
     private StringProperty newCourseTags;
     private StringProperty statusMessage;
+    private BooleanProperty canEditSelectedCourse;
+    private BooleanProperty canDeleteSelectedCourse;
+    private BooleanProperty canEnrollSelectedCourse;
     private ObservableList<Course> allCourses;
     private ObservableList<Course> courseList;
+    private Set<Integer> registeredCourseIds;
+    private Course selectedCourse;
     private Course courseForEnrollment;
     private Course lastEnrolledCourse;
     private Runnable onEnrollmentSuccess;
@@ -39,8 +48,12 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.newCourseInfo = new SimpleStringProperty("");
         this.newCourseTags = new SimpleStringProperty("");
         this.statusMessage = new SimpleStringProperty("");
+        this.canEditSelectedCourse = new SimpleBooleanProperty(false);
+        this.canDeleteSelectedCourse = new SimpleBooleanProperty(false);
+        this.canEnrollSelectedCourse = new SimpleBooleanProperty(false);
         this.allCourses = FXCollections.observableArrayList();
         this.courseList = FXCollections.observableArrayList();
+        this.registeredCourseIds = new HashSet<>();
 
         // Search is local because the dashboard already has all loaded courses
         this.searchText.addListener((observable, oldValue, newValue) -> applyCourseFilter());
@@ -50,11 +63,13 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model.addListener("CourseDeleted", this);
         this.model.addListener("CourseUpdated", this);
         this.model.addListener("CourseEnrolled", this);
+        this.model.addListener("RegisteredCoursesRetrieved", this);
         this.model.addListener("UserTagsUpdated", this);
         this.model.addListener("NewNotification", this);
         
         // Fetch courses immediately when dashboard opens
         this.model.fetchCourses();
+        this.model.fetchRegisteredCourses();
     }
 
     public void addCourse() {
@@ -135,12 +150,20 @@ public class DashboardViewModel implements PropertyChangeListener {
     public StringProperty newCourseInfoProperty() { return newCourseInfo; }
     public StringProperty newCourseTagsProperty() { return newCourseTags; }
     public StringProperty statusMessageProperty() { return statusMessage; }
+    public BooleanProperty canEditSelectedCourseProperty() { return canEditSelectedCourse; }
+    public BooleanProperty canDeleteSelectedCourseProperty() { return canDeleteSelectedCourse; }
+    public BooleanProperty canEnrollSelectedCourseProperty() { return canEnrollSelectedCourse; }
     public ObservableList<Course> getCourseList() { return courseList; }
     public ClientModel getModel() { return model; }
     public Course getLastEnrolledCourse() { return lastEnrolledCourse; }
 
     public void setOnEnrollmentSuccess(Runnable onEnrollmentSuccess) {
         this.onEnrollmentSuccess = onEnrollmentSuccess;
+    }
+
+    public void setSelectedCourse(Course selectedCourse) {
+        this.selectedCourse = selectedCourse;
+        updateButtonState();
     }
 
     public void enrollInCourse(Course course) {
@@ -286,14 +309,26 @@ public class DashboardViewModel implements PropertyChangeListener {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Successfully enrolled in the course!");
                     lastEnrolledCourse = courseForEnrollment;
+                    if (lastEnrolledCourse != null) {
+                        registeredCourseIds.add(lastEnrolledCourse.getId());
+                    }
                     courseForEnrollment = null;
+                    updateButtonState();
                     if (onEnrollmentSuccess != null) {
                         onEnrollmentSuccess.run();
                     }
                 } else {
                     statusMessage.set("Failed to enroll. Maybe already enrolled?");
                     courseForEnrollment = null;
+                    updateButtonState();
                 }
+            } else if ("RegisteredCoursesRetrieved".equals(evt.getPropertyName())) {
+                List<Course> courses = (List<Course>) evt.getNewValue();
+                registeredCourseIds.clear();
+                for (Course course : courses) {
+                    registeredCourseIds.add(course.getId());
+                }
+                updateButtonState();
             } else if ("UserTagsUpdated".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Your tags were saved.");
@@ -307,5 +342,25 @@ public class DashboardViewModel implements PropertyChangeListener {
                 statusMessage.set("🔔 " + notif.getTitle() + ": " + notif.getMessageInformation());
             }
         });
+    }
+
+    private void updateButtonState() {
+        boolean ownsSelectedCourse = currentUserOwnsCourse(selectedCourse);
+        boolean canEnroll = selectedCourse != null
+                && !ownsSelectedCourse
+                && !registeredCourseIds.contains(selectedCourse.getId())
+                && model.getCurrentUser() instanceof Student;
+
+        // These properties only control the buttons. Server-side checks still protect the data.
+        canEditSelectedCourse.set(ownsSelectedCourse);
+        canDeleteSelectedCourse.set(ownsSelectedCourse);
+        canEnrollSelectedCourse.set(canEnroll);
+    }
+
+    private boolean currentUserOwnsCourse(Course course) {
+        if (course == null || course.getTutor() == null || model.getCurrentUser() == null) {
+            return false;
+        }
+        return course.getTutor().getName().equals(model.getCurrentUser().getName());
     }
 }
