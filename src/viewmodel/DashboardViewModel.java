@@ -32,6 +32,7 @@ public class DashboardViewModel implements PropertyChangeListener {
 
         this.model.addListener("CoursesRetrieved", this);
         this.model.addListener("CourseAdded", this);
+        this.model.addListener("CourseEnrolled", this);
         this.model.addListener("NewNotification", this);
         
         // Fetch courses immediately when dashboard opens
