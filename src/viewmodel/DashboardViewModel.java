@@ -36,6 +36,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model.addListener("CoursesRetrieved", this);
         this.model.addListener("CourseAdded", this);
         this.model.addListener("CourseDeleted", this);
+        this.model.addListener("CourseUpdated", this);
         this.model.addListener("CourseEnrolled", this);
         this.model.addListener("NewNotification", this);
         
@@ -76,6 +77,30 @@ public class DashboardViewModel implements PropertyChangeListener {
 
         statusMessage.set("Deleting course...");
         model.deleteCourse(course);
+    }
+
+    public void updateCourse(Course course, String newName, String newInformation) {
+        if (course == null) {
+            statusMessage.set("Please select a course to edit.");
+            return;
+        }
+        if (newName.isEmpty() || newInformation.isEmpty()) {
+            statusMessage.set("Please fill in both course name and info.");
+            return;
+        }
+        if (!(model.getCurrentUser() instanceof Student)) {
+            statusMessage.set("Only Students can edit their own courses.");
+            return;
+        }
+        if (course.getTutor() == null || !course.getTutor().getName().equals(model.getCurrentUser().getName())) {
+            statusMessage.set("You can only edit courses you created.");
+            return;
+        }
+
+        Course updatedCourse = new Course(newName, newInformation, course.getTutor());
+        updatedCourse.setId(course.getId());
+        statusMessage.set("Updating course...");
+        model.updateCourse(updatedCourse);
     }
     
     public void refreshCourses() {
@@ -132,6 +157,13 @@ public class DashboardViewModel implements PropertyChangeListener {
                     model.fetchCourses();
                 } else {
                     statusMessage.set("Failed to delete course.");
+                }
+            } else if ("CourseUpdated".equals(evt.getPropertyName())) {
+                if ("SUCCESS".equals(evt.getNewValue())) {
+                    statusMessage.set("Course updated successfully!");
+                    model.fetchCourses();
+                } else {
+                    statusMessage.set("Failed to update course.");
                 }
             } else if ("CourseEnrolled".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {

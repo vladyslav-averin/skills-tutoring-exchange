@@ -98,6 +98,16 @@ public class ClientHandler implements Runnable {
                 } else {
                     return new Response(false, "Failed to delete course", null);
                 }
+            case "UPDATE_COURSE":
+                Object[] updateData = (Object[]) request.getPayload();
+                User userUpdatingCourse = (User) updateData[0];
+                Course courseToUpdate = (Course) updateData[1];
+                boolean courseUpdated = courseDAO.updateCourse(courseToUpdate, userUpdatingCourse);
+                if (courseUpdated) {
+                    return new Response(true, "Course updated successfully", courseToUpdate);
+                } else {
+                    return new Response(false, "Failed to update course", null);
+                }
             case "ENROLL_COURSE":
                 // Payload contains array [Student, Course]
                 Object[] enrollData = (Object[]) request.getPayload();

@@ -75,6 +75,10 @@ public class NetworkClient {
                             model.fireEvent("CourseDeleted", null, "SUCCESS");
                         } else if ("Failed to delete course".equals(response.getMessage())) {
                             model.fireEvent("CourseDeleted", null, "FAILED");
+                        } else if ("Course updated successfully".equals(response.getMessage())) {
+                            model.fireEvent("CourseUpdated", null, "SUCCESS");
+                        } else if ("Failed to update course".equals(response.getMessage())) {
+                            model.fireEvent("CourseUpdated", null, "FAILED");
                         } else if ("Successfully enrolled in course".equals(response.getMessage())) {
                             model.fireEvent("CourseEnrolled", null, "SUCCESS");
                         } else if ("Failed to enroll or already enrolled".equals(response.getMessage())) {

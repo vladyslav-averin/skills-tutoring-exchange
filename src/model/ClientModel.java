@@ -48,6 +48,11 @@ public class ClientModel {
         networkClient.sendRequest(new Request("DELETE_COURSE", payload));
     }
 
+    public void updateCourse(model.Course course) {
+        Object[] payload = {currentUser, course};
+        networkClient.sendRequest(new Request("UPDATE_COURSE", payload));
+    }
+
     public void enrollCourse(model.Course course) {
         Object[] payload = {currentUser, course};
         networkClient.sendRequest(new Request("ENROLL_COURSE", payload));

@@ -116,6 +116,29 @@ public class CourseDAO {
         }
     }
 
+    public boolean updateCourse(Course course, User currentUser) {
+        String sql = "UPDATE courses SET name = ?, information = ? WHERE id = ? AND tutor_id = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int tutorId = getUserIdByName(currentUser.getName());
+            if (course.getId() == -1 || tutorId == -1) return false;
+
+            pstmt.setString(1, course.getName());
+            pstmt.setString(2, course.getInformation());
+            pstmt.setInt(3, course.getId());
+            pstmt.setInt(4, tutorId);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error updating course.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private int getCourseId(String courseName, String tutorName) throws SQLException {
         String sql = "SELECT c.id FROM courses c JOIN users u ON c.tutor_id = u.id " +
                      "WHERE c.name = ? AND u.name = ?";

@@ -3,17 +3,20 @@ package view;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import viewmodel.ChatHistoryViewModel;
 import viewmodel.ChatViewModel;
 import viewmodel.DashboardViewModel;
 import java.io.IOException;
+import java.util.Optional;
 
 public class MainDashboardController {
 
@@ -81,6 +84,32 @@ public class MainDashboardController {
         }
 
         viewModel.deleteCourse(selectedCourse);
+    }
+
+    @FXML
+    public void onEditCourseButton() {
+        model.Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
+        if (selectedCourse == null) {
+            viewModel.updateCourse(null, "", "");
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Edit Course");
+        dialog.setHeaderText("Edit your course");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField nameField = new TextField(selectedCourse.getName());
+        TextField infoField = new TextField(selectedCourse.getInformation());
+
+        VBox content = new VBox(10);
+        content.getChildren().addAll(new Label("Course name"), nameField, new Label("Course info"), infoField);
+        dialog.getDialogPane().setContent(content);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            viewModel.updateCourse(selectedCourse, nameField.getText(), infoField.getText());
+        }
     }
 
     @FXML
