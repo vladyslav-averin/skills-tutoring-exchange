@@ -161,6 +161,17 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.onEnrollmentSuccess = onEnrollmentSuccess;
     }
 
+    public void dispose() {
+        model.removeListener("CoursesRetrieved", this);
+        model.removeListener("CourseAdded", this);
+        model.removeListener("CourseDeleted", this);
+        model.removeListener("CourseUpdated", this);
+        model.removeListener("CourseEnrolled", this);
+        model.removeListener("RegisteredCoursesRetrieved", this);
+        model.removeListener("UserTagsUpdated", this);
+        model.removeListener("NewNotification", this);
+    }
+
     public void setSelectedCourse(Course selectedCourse) {
         this.selectedCourse = selectedCourse;
         updateButtonState();

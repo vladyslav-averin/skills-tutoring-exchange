@@ -81,6 +81,13 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
         return statusMessage;
     }
 
+    public void dispose() {
+        model.removeListener("UsersRetrieved", this);
+        model.removeListener("CoursesRetrieved", this);
+        model.removeListener("AdminUserDeleted", this);
+        model.removeListener("AdminCourseDeleted", this);
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         Platform.runLater(() -> {

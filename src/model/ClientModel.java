@@ -93,6 +93,10 @@ public class ClientModel {
         networkClient.sendRequest(new Request("SEND_DIRECT_MESSAGE", msg));
     }
 
+    public void logout() {
+        currentUser = null;
+    }
+
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
     }

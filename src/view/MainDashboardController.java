@@ -40,6 +40,7 @@ public class MainDashboardController {
     @FXML private Label statusLabel;
 
     private DashboardViewModel viewModel;
+    private Runnable onLogout;
 
     public void init(DashboardViewModel viewModel) {
         this.viewModel = viewModel;
@@ -62,6 +63,10 @@ public class MainDashboardController {
         editCourseButton.disableProperty().bind(viewModel.canEditSelectedCourseProperty().not());
         enrollCourseButton.disableProperty().bind(viewModel.canEnrollSelectedCourseProperty().not());
         viewModel.setOnEnrollmentSuccess(() -> openTutorChat(viewModel.getLastEnrolledCourse()));
+    }
+
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
     }
 
     @FXML
@@ -149,6 +154,13 @@ public class MainDashboardController {
     @FXML
     public void onRefreshButton() {
         viewModel.refreshCourses();
+    }
+
+    @FXML
+    public void onLogoutButton() {
+        if (onLogout != null) {
+            onLogout.run();
+        }
     }
 
     @FXML

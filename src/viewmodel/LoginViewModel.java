@@ -59,6 +59,13 @@ public class LoginViewModel implements PropertyChangeListener {
     public StringProperty errorProperty() { return errorProperty; }
     public ObjectProperty<Paint> statusColorProperty() { return statusColor; }
 
+    public void resetForm() {
+        usernameProperty.set("");
+        passwordProperty.set("");
+        errorProperty.set("");
+        statusColor.set(Paint.valueOf("#e74c3c"));
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // This is called when the Model fires an event (which happens when NetworkClient receives a Response)

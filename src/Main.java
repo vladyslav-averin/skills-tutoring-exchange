@@ -3,6 +3,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import model.ClientModel;
 import model.Administrator;
 import view.AdminDashboardController;
@@ -13,10 +14,12 @@ import viewmodel.DashboardViewModel;
 import viewmodel.LoginViewModel;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
     private ClientModel clientModel;
+    private LoginViewModel loginViewModel;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -25,15 +28,7 @@ public class Main extends Application {
         clientModel.start(); // This attempts to connect to the Server (make sure ServerMain is running!)
 
         // 2. Initialize ViewModel
-        LoginViewModel loginViewModel = new LoginViewModel(clientModel);
-
-        // 3. Load View (FXML)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
-        Parent root = loader.load();
-
-        // 4. Inject ViewModel into Controller
-        LoginViewController controller = loader.getController();
-        controller.init(loginViewModel);
+        loginViewModel = new LoginViewModel(clientModel);
 
         // Define Scene transition on successful login
         loginViewModel.setOnLoginSuccess(() -> {
@@ -48,10 +43,8 @@ public class Main extends Application {
             }
         });
 
-        // 5. Setup Scene and Stage
-        Scene scene = new Scene(root, 400, 500);
-        primaryStage.setTitle("Skills & Tutoring Exchange");
-        primaryStage.setScene(scene);
+        // 3. Setup Scene and Stage
+        openLoginView(primaryStage);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -67,6 +60,20 @@ public class Main extends Application {
         launch(args);
     }
 
+    private void openLoginView(Stage primaryStage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
+        Parent root = loader.load();
+
+        LoginViewController controller = loader.getController();
+        loginViewModel.resetForm();
+        controller.init(loginViewModel);
+
+        Scene loginScene = new Scene(root, 400, 500);
+        primaryStage.setScene(loginScene);
+        primaryStage.setTitle("Skills & Tutoring Exchange");
+        primaryStage.sizeToScene();
+    }
+
     private void openStudentDashboard(Stage primaryStage) throws IOException {
         FXMLLoader dashLoader = new FXMLLoader(getClass().getResource("/view/MainDashboard.fxml"));
         Parent dashRoot = dashLoader.load();
@@ -74,10 +81,15 @@ public class Main extends Application {
         DashboardViewModel dashViewModel = new DashboardViewModel(clientModel);
         MainDashboardController dashController = dashLoader.getController();
         dashController.init(dashViewModel);
+        dashController.setOnLogout(() -> {
+            dashViewModel.dispose();
+            logout(primaryStage);
+        });
 
         Scene dashScene = new Scene(dashRoot, 800, 650);
         primaryStage.setScene(dashScene);
         primaryStage.setTitle("Skills & Tutoring Exchange - Dashboard");
+        primaryStage.sizeToScene();
     }
 
     private void openAdminDashboard(Stage primaryStage) throws IOException {
@@ -87,9 +99,32 @@ public class Main extends Application {
         AdminDashboardViewModel adminViewModel = new AdminDashboardViewModel(clientModel);
         AdminDashboardController adminController = adminLoader.getController();
         adminController.init(adminViewModel);
+        adminController.setOnLogout(() -> {
+            adminViewModel.dispose();
+            logout(primaryStage);
+        });
 
         Scene adminScene = new Scene(adminRoot, 800, 600);
         primaryStage.setScene(adminScene);
         primaryStage.setTitle("Skills & Tutoring Exchange - Admin");
+        primaryStage.sizeToScene();
+    }
+
+    private void logout(Stage primaryStage) {
+        try {
+            closeExtraWindows(primaryStage);
+            clientModel.logout();
+            openLoginView(primaryStage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeExtraWindows(Stage primaryStage) {
+        for (Window window : new ArrayList<>(Window.getWindows())) {
+            if (window instanceof Stage && window != primaryStage) {
+                ((Stage) window).close();
+            }
+        }
     }
 }

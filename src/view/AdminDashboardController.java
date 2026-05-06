@@ -21,6 +21,7 @@ public class AdminDashboardController {
     @FXML private Label statusLabel;
 
     private AdminDashboardViewModel viewModel;
+    private Runnable onLogout;
 
     public void init(AdminDashboardViewModel viewModel) {
         this.viewModel = viewModel;
@@ -34,9 +35,20 @@ public class AdminDashboardController {
         courseListView.setCellFactory(listView -> createCourseCell());
     }
 
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
+    }
+
     @FXML
     public void onRefreshButton() {
         viewModel.refreshData();
+    }
+
+    @FXML
+    public void onLogoutButton() {
+        if (onLogout != null) {
+            onLogout.run();
+        }
     }
 
     @FXML

@@ -19,7 +19,12 @@
                </font>
             </Label>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#onRefreshButton" style="-fx-background-color: #34495e; -fx-text-fill: white;" text="Refresh" />
+            <Button mnemonicParsing="false" onAction="#onRefreshButton" style="-fx-background-color: #34495e; -fx-text-fill: white;" text="Refresh">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onLogoutButton" style="-fx-background-color: #7f8c8d; -fx-text-fill: white;" text="Logout" />
          </children>
       </HBox>
    </top>
