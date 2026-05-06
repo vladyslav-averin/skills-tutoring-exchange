@@ -25,18 +25,17 @@ public class ClientModel {
         networkClient.sendRequest(new Request("LOGIN", credentials));
     }
 
-    public void register(String userType, String username, String password) {
-        User newUser;
-        if ("Administrator".equals(userType)) {
-            newUser = new Administrator(username, password);
-        } else {
-            newUser = new Student(username, password);
-        }
+    public void registerStudent(String username, String password) {
+        User newUser = new Student(username, password);
         networkClient.sendRequest(new Request("REGISTER", newUser));
     }
 
     public void fetchCourses() {
         networkClient.sendRequest(new Request("GET_COURSES", null));
+    }
+
+    public void fetchUsers() {
+        networkClient.sendRequest(new Request("GET_USERS", null));
     }
 
     public void updateCurrentUserTags(String tags) {
@@ -51,6 +50,14 @@ public class ClientModel {
     public void deleteCourse(model.Course course) {
         Object[] payload = {currentUser, course};
         networkClient.sendRequest(new Request("DELETE_COURSE", payload));
+    }
+
+    public void adminDeleteCourse(model.Course course) {
+        networkClient.sendRequest(new Request("ADMIN_DELETE_COURSE", course));
+    }
+
+    public void adminDeleteUser(User user) {
+        networkClient.sendRequest(new Request("ADMIN_DELETE_USER", user));
     }
 
     public void updateCourse(model.Course course) {

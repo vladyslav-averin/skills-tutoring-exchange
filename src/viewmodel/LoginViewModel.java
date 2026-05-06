@@ -47,7 +47,7 @@ public class LoginViewModel implements PropertyChangeListener {
             return;
         }
         showInfo("Registering...");
-        model.register("Student", usernameProperty.get(), passwordProperty.get());
+        model.registerStudent(usernameProperty.get(), passwordProperty.get());
     }
 
     public void setOnLoginSuccess(Runnable onLoginSuccess) {

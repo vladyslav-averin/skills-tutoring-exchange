@@ -82,6 +82,33 @@ public class UserDAO {
         }
     }
 
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT user_type, name, tags FROM users ORDER BY user_type, name";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                User user;
+                // The admin screen does not need to know user passwords.
+                if ("Administrator".equals(rs.getString("user_type"))) {
+                    user = new Administrator(rs.getString("name"), "");
+                } else {
+                    user = new Student(rs.getString("name"), "");
+                }
+                user.setTags(rs.getString("tags"));
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching users.");
+            e.printStackTrace();
+        }
+        return users;
+    }
+
     // Method to delete a user by name (useful for Admin)
     public boolean deleteUser(String name) {
         String sql = "DELETE FROM users WHERE name = ?";

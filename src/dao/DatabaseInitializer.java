@@ -30,6 +30,13 @@ public class DatabaseInitializer {
             String addUserTagsColumn = "ALTER TABLE users ADD COLUMN IF NOT EXISTS tags TEXT";
             stmt.execute(addUserTagsColumn);
 
+            // Create one default admin account for the demo if it does not exist yet.
+            // Normal users can only register as Students from the login screen.
+            String createDefaultAdmin = "INSERT INTO users (user_type, name, password, tags) " +
+                    "SELECT 'Administrator', 'admin', 'admin', '' " +
+                    "WHERE NOT EXISTS (SELECT 1 FROM users WHERE name = 'admin' AND user_type = 'Administrator')";
+            stmt.execute(createDefaultAdmin);
+
             // 2. Create Courses Table
             // 1-to-many relationship: A tutor (student) provides many courses
             String createCoursesTable = "CREATE TABLE IF NOT EXISTS courses (" +

@@ -67,6 +67,8 @@ public class NetworkClient {
                             model.fireEvent("RegisterResult", null, "FAILED");
                         } else if ("Courses retrieved".equals(response.getMessage())) {
                             model.fireEvent("CoursesRetrieved", null, response.getPayload());
+                        } else if ("Users retrieved".equals(response.getMessage())) {
+                            model.fireEvent("UsersRetrieved", null, response.getPayload());
                         } else if ("User tags updated successfully".equals(response.getMessage())) {
                             model.setCurrentUser((User) response.getPayload());
                             model.fireEvent("UserTagsUpdated", null, "SUCCESS");
@@ -80,6 +82,15 @@ public class NetworkClient {
                             model.fireEvent("CourseDeleted", null, "SUCCESS");
                         } else if ("Failed to delete course".equals(response.getMessage())) {
                             model.fireEvent("CourseDeleted", null, "FAILED");
+                        } else if ("Admin course deleted successfully".equals(response.getMessage())) {
+                            model.fireEvent("AdminCourseDeleted", null, "SUCCESS");
+                        } else if ("Failed to delete course as admin".equals(response.getMessage())) {
+                            model.fireEvent("AdminCourseDeleted", null, "FAILED");
+                        } else if ("Admin user deleted successfully".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserDeleted", null, "SUCCESS");
+                        } else if ("Failed to delete user as admin".equals(response.getMessage())
+                                || "Administrator cannot delete this account".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserDeleted", null, "FAILED");
                         } else if ("Course updated successfully".equals(response.getMessage())) {
                             model.fireEvent("CourseUpdated", null, "SUCCESS");
                         } else if ("Failed to update course".equals(response.getMessage())) {

@@ -4,8 +4,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.ClientModel;
+import model.Administrator;
+import view.AdminDashboardController;
 import view.LoginViewController;
 import view.MainDashboardController;
+import viewmodel.AdminDashboardViewModel;
 import viewmodel.DashboardViewModel;
 import viewmodel.LoginViewModel;
 
@@ -35,16 +38,11 @@ public class Main extends Application {
         // Define Scene transition on successful login
         loginViewModel.setOnLoginSuccess(() -> {
             try {
-                FXMLLoader dashLoader = new FXMLLoader(getClass().getResource("/view/MainDashboard.fxml"));
-                Parent dashRoot = dashLoader.load();
-
-                DashboardViewModel dashViewModel = new DashboardViewModel(clientModel);
-                MainDashboardController dashController = dashLoader.getController();
-                dashController.init(dashViewModel);
-
-                Scene dashScene = new Scene(dashRoot, 800, 650);
-                primaryStage.setScene(dashScene);
-                primaryStage.setTitle("Skills & Tutoring Exchange - Dashboard");
+                if (clientModel.getCurrentUser() instanceof Administrator) {
+                    openAdminDashboard(primaryStage);
+                } else {
+                    openStudentDashboard(primaryStage);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -67,5 +65,31 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private void openStudentDashboard(Stage primaryStage) throws IOException {
+        FXMLLoader dashLoader = new FXMLLoader(getClass().getResource("/view/MainDashboard.fxml"));
+        Parent dashRoot = dashLoader.load();
+
+        DashboardViewModel dashViewModel = new DashboardViewModel(clientModel);
+        MainDashboardController dashController = dashLoader.getController();
+        dashController.init(dashViewModel);
+
+        Scene dashScene = new Scene(dashRoot, 800, 650);
+        primaryStage.setScene(dashScene);
+        primaryStage.setTitle("Skills & Tutoring Exchange - Dashboard");
+    }
+
+    private void openAdminDashboard(Stage primaryStage) throws IOException {
+        FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/view/AdminDashboard.fxml"));
+        Parent adminRoot = adminLoader.load();
+
+        AdminDashboardViewModel adminViewModel = new AdminDashboardViewModel(clientModel);
+        AdminDashboardController adminController = adminLoader.getController();
+        adminController.init(adminViewModel);
+
+        Scene adminScene = new Scene(adminRoot, 800, 600);
+        primaryStage.setScene(adminScene);
+        primaryStage.setTitle("Skills & Tutoring Exchange - Admin");
     }
 }

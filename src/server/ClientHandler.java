@@ -3,6 +3,7 @@ package server;
 import dao.ChatDAO;
 import dao.CourseDAO;
 import dao.UserDAO;
+import model.Administrator;
 import model.Course;
 import model.Message;
 import model.Notification;
@@ -76,6 +77,10 @@ public class ClientHandler implements Runnable {
                 }
             case "REGISTER":
                 User newUser = (User) request.getPayload();
+                // Admin accounts are created by the system, not by the register form.
+                if (newUser instanceof Administrator) {
+                    return new Response(false, "Failed to create account", null);
+                }
                 boolean created = userDAO.createUser(newUser);
                 if (created) {
                     return new Response(true, "Account created successfully", newUser);
@@ -84,6 +89,12 @@ public class ClientHandler implements Runnable {
                 }
             case "GET_COURSES":
                 return new Response(true, "Courses retrieved", courseDAO.getAllCourses());
+            case "GET_USERS":
+                if (currentUser instanceof Administrator) {
+                    return new Response(true, "Users retrieved", userDAO.getAllUsers());
+                } else {
+                    return new Response(false, "Only administrators can view users", null);
+                }
             case "UPDATE_USER_TAGS":
                 User userWithNewTags = (User) request.getPayload();
                 boolean tagsUpdated = userDAO.updateUserTags(userWithNewTags);
@@ -110,6 +121,31 @@ public class ClientHandler implements Runnable {
                     return new Response(true, "Course deleted successfully", courseToDelete);
                 } else {
                     return new Response(false, "Failed to delete course", null);
+                }
+            case "ADMIN_DELETE_COURSE":
+                Course adminCourseToDelete = (Course) request.getPayload();
+                if (!(currentUser instanceof Administrator)) {
+                    return new Response(false, "Only administrators can delete any course", null);
+                }
+                boolean adminCourseDeleted = courseDAO.deleteCourseAsAdmin(adminCourseToDelete);
+                if (adminCourseDeleted) {
+                    return new Response(true, "Admin course deleted successfully", adminCourseToDelete);
+                } else {
+                    return new Response(false, "Failed to delete course as admin", null);
+                }
+            case "ADMIN_DELETE_USER":
+                User userToDelete = (User) request.getPayload();
+                if (!(currentUser instanceof Administrator)) {
+                    return new Response(false, "Only administrators can delete users", null);
+                }
+                if (userToDelete == null || userToDelete.getName().equals(currentUser.getName())) {
+                    return new Response(false, "Administrator cannot delete this account", null);
+                }
+                boolean adminUserDeleted = userDAO.deleteUser(userToDelete.getName());
+                if (adminUserDeleted) {
+                    return new Response(true, "Admin user deleted successfully", userToDelete);
+                } else {
+                    return new Response(false, "Failed to delete user as admin", null);
                 }
             case "UPDATE_COURSE":
                 Object[] updateData = (Object[]) request.getPayload();

@@ -171,6 +171,25 @@ public class CourseDAO {
         }
     }
 
+    public boolean deleteCourseAsAdmin(Course course) {
+        if (course == null || course.getId() == -1) return false;
+
+        String sql = "DELETE FROM courses WHERE id = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, course.getId());
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting course as admin.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean updateCourse(Course course, User currentUser) {
         String sql = "UPDATE courses SET name = ?, information = ?, tags = ? WHERE id = ? AND tutor_id = ?";
         Connection conn = DatabaseConnection.getInstance().getConnection();
