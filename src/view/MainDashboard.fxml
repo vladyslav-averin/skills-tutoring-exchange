@@ -21,17 +21,17 @@
                </font>
             </Label>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button fx:id="notificationsButton" mnemonicParsing="false" onAction="#onOpenNotificationsButton" style="-fx-background-color: #9b59b6; -fx-text-fill: white;" text="Notifications">
+            <Button fx:id="notificationsButton" mnemonicParsing="false" onAction="#onOpenNotificationsButton" style="-fx-background-color: #6c5ce7; -fx-text-fill: white;" text="Notifications">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" text="Chats">
+            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #1f6feb; -fx-text-fill: white;" text="Chats">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onOpenRegistrationsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="Registrations">
+            <Button mnemonicParsing="false" onAction="#onOpenRegistrationsButton" style="-fx-background-color: #0f766e; -fx-text-fill: white;" text="Registrations">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
@@ -41,7 +41,7 @@
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onLogoutButton" style="-fx-background-color: #7f8c8d; -fx-text-fill: white;" text="Logout" />
+            <Button mnemonicParsing="false" onAction="#onLogoutButton" style="-fx-background-color: #576574; -fx-text-fill: white;" text="Logout" />
          </children>
       </HBox>
    </top>

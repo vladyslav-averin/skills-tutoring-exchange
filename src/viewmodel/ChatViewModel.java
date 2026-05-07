@@ -83,15 +83,20 @@ public class ChatViewModel implements PropertyChangeListener {
                     }
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {
-                // The server sends this only to the receiver of a direct message.
-                // We reload this chat so the new message appears without reopening the window.
                 model.Notification notif = (model.Notification) evt.getNewValue();
-                if (notif.getTitle().equals("New Message")) {
-                    fetchHistory();
-                } else {
+                // Only the chat with the sender should react to this notification.
+                if (isNotificationFromChatPartner(notif)) {
+                    model.markNotificationsFromUserRead(chatPartner.getName());
                     fetchHistory();
                 }
             }
         });
+    }
+
+    private boolean isNotificationFromChatPartner(model.Notification notification) {
+        if (notification == null || chatPartner == null) {
+            return false;
+        }
+        return chatPartner.getName().equals(notification.getRelatedUserName());
     }
 }
