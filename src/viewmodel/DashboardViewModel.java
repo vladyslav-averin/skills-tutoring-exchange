@@ -69,6 +69,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model.addListener("UserTagsUpdated", this);
         this.model.addListener("NewNotification", this);
         this.model.addListener("NotificationsRead", this);
+        this.model.addListener("NotificationRemoved", this);
         this.model.addListener("NotificationsCleared", this);
         
         // Fetch courses immediately when dashboard opens
@@ -176,6 +177,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         model.removeListener("UserTagsUpdated", this);
         model.removeListener("NewNotification", this);
         model.removeListener("NotificationsRead", this);
+        model.removeListener("NotificationRemoved", this);
         model.removeListener("NotificationsCleared", this);
     }
 
@@ -360,6 +362,8 @@ public class DashboardViewModel implements PropertyChangeListener {
                 statusMessage.set("Notification - " + notif.getTitle() + ": " + notif.getMessageInformation());
                 updateNotificationsButtonText();
             } else if ("NotificationsRead".equals(evt.getPropertyName())) {
+                updateNotificationsButtonText();
+            } else if ("NotificationRemoved".equals(evt.getPropertyName())) {
                 updateNotificationsButtonText();
             } else if ("NotificationsCleared".equals(evt.getPropertyName())) {
                 statusMessage.set("Notifications cleared");

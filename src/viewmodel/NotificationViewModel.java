@@ -1,8 +1,6 @@
 package viewmodel;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.ClientModel;
@@ -14,19 +12,17 @@ import java.beans.PropertyChangeListener;
 public class NotificationViewModel implements PropertyChangeListener {
     private ClientModel model;
     private ObservableList<Notification> notifications;
-    private StringProperty statusMessage;
 
     public NotificationViewModel(ClientModel model) {
         this.model = model;
         this.notifications = FXCollections.observableArrayList();
-        this.statusMessage = new SimpleStringProperty("");
 
         // Load notifications that arrived before this window was opened.
         this.notifications.addAll(model.getNotificationHistory());
-        updateStatusMessage();
 
         this.model.addListener("NewNotification", this);
         this.model.addListener("NotificationsRead", this);
+        this.model.addListener("NotificationRemoved", this);
         this.model.addListener("NotificationsCleared", this);
     }
 
@@ -38,10 +34,6 @@ public class NotificationViewModel implements PropertyChangeListener {
         return model;
     }
 
-    public StringProperty statusMessageProperty() {
-        return statusMessage;
-    }
-
     public void clearNotifications() {
         model.clearNotifications();
     }
@@ -49,6 +41,7 @@ public class NotificationViewModel implements PropertyChangeListener {
     public void dispose() {
         model.removeListener("NewNotification", this);
         model.removeListener("NotificationsRead", this);
+        model.removeListener("NotificationRemoved", this);
         model.removeListener("NotificationsCleared", this);
     }
 
@@ -58,24 +51,18 @@ public class NotificationViewModel implements PropertyChangeListener {
             if ("NewNotification".equals(evt.getPropertyName())) {
                 Notification notification = (Notification) evt.getNewValue();
                 notifications.add(notification);
-                updateStatusMessage();
             } else if ("NotificationsRead".equals(evt.getPropertyName())) {
                 notifications.setAll(model.getNotificationHistory());
-                updateStatusMessage();
+            } else if ("NotificationRemoved".equals(evt.getPropertyName())) {
+                Notification notification = (Notification) evt.getNewValue();
+                notifications.remove(notification);
             } else if ("NotificationsCleared".equals(evt.getPropertyName())) {
                 notifications.clear();
-                updateStatusMessage();
             }
         });
     }
 
-    private void updateStatusMessage() {
-        if (notifications.isEmpty()) {
-            statusMessage.set("No notifications yet");
-        } else if (notifications.size() == 1) {
-            statusMessage.set("1 notification");
-        } else {
-            statusMessage.set(notifications.size() + " notifications");
-        }
+    public void removeNotification(Notification notification) {
+        model.removeNotification(notification);
     }
 }

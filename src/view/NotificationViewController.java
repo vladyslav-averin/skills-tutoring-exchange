@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 public class NotificationViewController {
 
     @FXML private ListView<Notification> notificationListView;
-    @FXML private Label statusLabel;
     @FXML private Button clearButton;
 
     private NotificationViewModel viewModel;
@@ -29,7 +28,6 @@ public class NotificationViewController {
 
         notificationListView.setItems(viewModel.getNotifications());
         notificationListView.setCellFactory(listView -> createNotificationCell());
-        statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         clearButton.disableProperty().bind(javafx.beans.binding.Bindings.isEmpty(viewModel.getNotifications()));
         notificationListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -50,7 +48,7 @@ public class NotificationViewController {
 
     @FXML
     public void onCloseButton() {
-        Stage stage = (Stage) statusLabel.getScene().getWindow();
+        Stage stage = (Stage) notificationListView.getScene().getWindow();
         stage.close();
     }
 
@@ -63,6 +61,8 @@ public class NotificationViewController {
         User chatPartner = new Student(selectedNotification.getRelatedUserName(), "");
 
         ChatWindowManager.openChat(viewModel.getModel(), chatPartner);
+        // The selected notification is handled after it opens the related chat.
+        viewModel.removeNotification(selectedNotification);
     }
 
     private ListCell<Notification> createNotificationCell() {

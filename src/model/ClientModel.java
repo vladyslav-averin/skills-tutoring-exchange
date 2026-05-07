@@ -164,6 +164,17 @@ public class ClientModel {
         fireEvent("NotificationsRead", null, null);
     }
 
+    public void removeNotification(Notification notification) {
+        if (notification == null) {
+            return;
+        }
+
+        synchronized (this) {
+            notificationHistory.remove(notification);
+        }
+        fireEvent("NotificationRemoved", null, notification);
+    }
+
     public void clearNotifications() {
         synchronized (this) {
             notificationHistory.clear();
