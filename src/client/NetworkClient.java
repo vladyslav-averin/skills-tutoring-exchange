@@ -89,8 +89,19 @@ public class NetworkClient {
                         } else if ("Admin user deleted successfully".equals(response.getMessage())) {
                             model.fireEvent("AdminUserDeleted", null, "SUCCESS");
                         } else if ("Failed to delete user as admin".equals(response.getMessage())
-                                || "Administrator cannot delete this account".equals(response.getMessage())) {
+                                || "Administrator cannot delete this account".equals(response.getMessage())
+                                || "Only main administrator can delete administrators".equals(response.getMessage())) {
                             model.fireEvent("AdminUserDeleted", null, "FAILED");
+                        } else if ("User promoted to admin successfully".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserPromoted", null, "SUCCESS");
+                        } else if ("Failed to promote user to admin".equals(response.getMessage())
+                                || "Only main administrator can change user roles".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserPromoted", null, "FAILED");
+                        } else if ("User demoted to student successfully".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserDemoted", null, "SUCCESS");
+                        } else if ("Failed to demote user to student".equals(response.getMessage())
+                                || "Only main administrator can change user roles".equals(response.getMessage())) {
+                            model.fireEvent("AdminUserDemoted", null, "FAILED");
                         } else if ("Course updated successfully".equals(response.getMessage())) {
                             model.fireEvent("CourseUpdated", null, "SUCCESS");
                         } else if ("Failed to update course".equals(response.getMessage())) {

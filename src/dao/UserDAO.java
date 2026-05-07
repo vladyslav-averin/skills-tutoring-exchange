@@ -125,4 +125,55 @@ public class UserDAO {
             return false;
         }
     }
+
+    public boolean isAdministrator(String name) {
+        String sql = "SELECT user_type FROM users WHERE name = ?";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return "Administrator".equals(rs.getString("user_type"));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error checking user role.");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean promoteStudentToAdmin(String name) {
+        String sql = "UPDATE users SET user_type = 'Administrator' WHERE name = ? AND user_type = 'Student'";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error promoting user to admin.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean demoteAdminToStudent(String name) {
+        String sql = "UPDATE users SET user_type = 'Student' WHERE name = ? AND user_type = 'Administrator'";
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error demoting user to student.");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

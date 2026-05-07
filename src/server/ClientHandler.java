@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
+    private static final String MAIN_ADMIN_NAME = "admin";
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -138,14 +139,49 @@ public class ClientHandler implements Runnable {
                 if (!(currentUser instanceof Administrator)) {
                     return new Response(false, "Only administrators can delete users", null);
                 }
-                if (userToDelete == null || userToDelete.getName().equals(currentUser.getName())) {
+                if (userToDelete == null
+                        || userToDelete.getName().equals(currentUser.getName())
+                        || MAIN_ADMIN_NAME.equals(userToDelete.getName())) {
                     return new Response(false, "Administrator cannot delete this account", null);
+                }
+                if (userDAO.isAdministrator(userToDelete.getName()) && !isMainAdmin()) {
+                    return new Response(false, "Only main administrator can delete administrators", null);
                 }
                 boolean adminUserDeleted = userDAO.deleteUser(userToDelete.getName());
                 if (adminUserDeleted) {
                     return new Response(true, "Admin user deleted successfully", userToDelete);
                 } else {
                     return new Response(false, "Failed to delete user as admin", null);
+                }
+            case "ADMIN_PROMOTE_USER":
+                User userToPromote = (User) request.getPayload();
+                if (!isMainAdmin()) {
+                    return new Response(false, "Only main administrator can change user roles", null);
+                }
+                if (userToPromote == null || userToPromote.getName().equals(currentUser.getName())) {
+                    return new Response(false, "Failed to promote user to admin", null);
+                }
+                boolean userPromoted = userDAO.promoteStudentToAdmin(userToPromote.getName());
+                if (userPromoted) {
+                    return new Response(true, "User promoted to admin successfully", userToPromote);
+                } else {
+                    return new Response(false, "Failed to promote user to admin", null);
+                }
+            case "ADMIN_DEMOTE_USER":
+                User userToDemote = (User) request.getPayload();
+                if (!isMainAdmin()) {
+                    return new Response(false, "Only main administrator can change user roles", null);
+                }
+                if (userToDemote == null
+                        || userToDemote.getName().equals(currentUser.getName())
+                        || MAIN_ADMIN_NAME.equals(userToDemote.getName())) {
+                    return new Response(false, "Failed to demote user to student", null);
+                }
+                boolean userDemoted = userDAO.demoteAdminToStudent(userToDemote.getName());
+                if (userDemoted) {
+                    return new Response(true, "User demoted to student successfully", userToDemote);
+                } else {
+                    return new Response(false, "Failed to demote user to student", null);
                 }
             case "UPDATE_COURSE":
                 Object[] updateData = (Object[]) request.getPayload();
@@ -225,6 +261,10 @@ public class ClientHandler implements Runnable {
             return null;
         }
         return currentUser.getName();
+    }
+
+    private boolean isMainAdmin() {
+        return currentUser instanceof Administrator && MAIN_ADMIN_NAME.equals(currentUser.getName());
     }
 
     private void closeConnections() {

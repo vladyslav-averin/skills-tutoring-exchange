@@ -3,6 +3,7 @@ package view;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -19,6 +20,10 @@ public class AdminDashboardController {
     @FXML private ListView<User> userListView;
     @FXML private ListView<Course> courseListView;
     @FXML private Label statusLabel;
+    @FXML private Button deleteUserButton;
+    @FXML private Button promoteUserButton;
+    @FXML private Button demoteUserButton;
+    @FXML private Button deleteCourseButton;
 
     private AdminDashboardViewModel viewModel;
     private Runnable onLogout;
@@ -28,11 +33,25 @@ public class AdminDashboardController {
 
         welcomeLabel.textProperty().bind(viewModel.welcomeMessageProperty());
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
+        promoteUserButton.visibleProperty().bind(viewModel.canManageUserRolesProperty());
+        promoteUserButton.managedProperty().bind(viewModel.canManageUserRolesProperty());
+        demoteUserButton.visibleProperty().bind(viewModel.canManageUserRolesProperty());
+        demoteUserButton.managedProperty().bind(viewModel.canManageUserRolesProperty());
+        deleteUserButton.disableProperty().bind(viewModel.canDeleteSelectedUserProperty().not());
+        promoteUserButton.disableProperty().bind(viewModel.canPromoteSelectedUserProperty().not());
+        demoteUserButton.disableProperty().bind(viewModel.canDemoteSelectedUserProperty().not());
+        deleteCourseButton.disableProperty().bind(viewModel.canDeleteSelectedCourseProperty().not());
 
         userListView.setItems(viewModel.getUsers());
         courseListView.setItems(viewModel.getCourses());
         userListView.setCellFactory(listView -> createUserCell());
         courseListView.setCellFactory(listView -> createCourseCell());
+        userListView.getSelectionModel().selectedItemProperty().addListener((observable, oldUser, newUser) -> {
+            viewModel.setSelectedUser(newUser);
+        });
+        courseListView.getSelectionModel().selectedItemProperty().addListener((observable, oldCourse, newCourse) -> {
+            viewModel.setSelectedCourse(newCourse);
+        });
     }
 
     public void setOnLogout(Runnable onLogout) {
@@ -69,6 +88,54 @@ public class AdminDashboardController {
         }
 
         viewModel.deleteUser(selectedUser);
+    }
+
+    @FXML
+    public void onPromoteUserButton() {
+        User selectedUser = userListView.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            viewModel.promoteUser(null);
+            return;
+        }
+        if (selectedUser instanceof Administrator) {
+            viewModel.promoteUser(selectedUser);
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Promotion");
+        confirmation.setHeaderText("Promote this user to administrator?");
+        confirmation.setContentText(selectedUser.getName());
+
+        if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        viewModel.promoteUser(selectedUser);
+    }
+
+    @FXML
+    public void onDemoteUserButton() {
+        User selectedUser = userListView.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            viewModel.demoteUser(null);
+            return;
+        }
+        if (!(selectedUser instanceof Administrator)) {
+            viewModel.demoteUser(selectedUser);
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Role Change");
+        confirmation.setHeaderText("Demote this administrator to student?");
+        confirmation.setContentText(selectedUser.getName());
+
+        if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        viewModel.demoteUser(selectedUser);
     }
 
     @FXML

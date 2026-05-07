@@ -39,7 +39,13 @@
                      </font>
                   </Label>
                   <ListView fx:id="userListView" prefHeight="400.0" prefWidth="260.0" VBox.vgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#onDeleteUserButton" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Delete User" />
+                  <VBox spacing="8.0">
+                     <children>
+                        <Button fx:id="deleteUserButton" mnemonicParsing="false" onAction="#onDeleteUserButton" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Delete User" />
+                        <Button fx:id="promoteUserButton" mnemonicParsing="false" onAction="#onPromoteUserButton" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Promote to Admin" />
+                        <Button fx:id="demoteUserButton" mnemonicParsing="false" onAction="#onDemoteUserButton" style="-fx-background-color: #f39c12; -fx-text-fill: white;" text="Demote to Student" />
+                     </children>
+                  </VBox>
                </children>
             </VBox>
             <VBox spacing="10.0" HBox.hgrow="ALWAYS">
@@ -50,7 +56,7 @@
                      </font>
                   </Label>
                   <ListView fx:id="courseListView" prefHeight="400.0" prefWidth="460.0" styleClass="course-list" VBox.vgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#onDeleteCourseButton" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Delete Course" />
+                  <Button fx:id="deleteCourseButton" mnemonicParsing="false" onAction="#onDeleteCourseButton" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Delete Course" />
                </children>
             </VBox>
          </children>

@@ -60,6 +60,14 @@ public class ClientModel {
         networkClient.sendRequest(new Request("ADMIN_DELETE_USER", user));
     }
 
+    public void adminPromoteUser(User user) {
+        networkClient.sendRequest(new Request("ADMIN_PROMOTE_USER", user));
+    }
+
+    public void adminDemoteUser(User user) {
+        networkClient.sendRequest(new Request("ADMIN_DEMOTE_USER", user));
+    }
+
     public void updateCourse(model.Course course) {
         Object[] payload = {currentUser, course};
         networkClient.sendRequest(new Request("UPDATE_COURSE", payload));
