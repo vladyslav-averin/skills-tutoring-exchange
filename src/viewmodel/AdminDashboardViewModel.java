@@ -61,19 +61,19 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
 
     public void deleteUser(User user) {
         if (user == null) {
-            statusMessage.set("Please select a user to delete.");
+            statusMessage.set("Please select a user to delete");
             return;
         }
         if (user.getName().equals(model.getCurrentUser().getName())) {
-            statusMessage.set("You cannot delete your own admin account.");
+            statusMessage.set("You cannot delete your own admin account");
             return;
         }
         if (MAIN_ADMIN_NAME.equals(user.getName())) {
-            statusMessage.set("The main admin account cannot be deleted.");
+            statusMessage.set("The main admin account cannot be deleted");
             return;
         }
         if (user instanceof Administrator && !currentUserIsMainAdmin()) {
-            statusMessage.set("Only the main admin can delete administrators.");
+            statusMessage.set("Only the main admin can delete administrators");
             return;
         }
 
@@ -83,15 +83,15 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
 
     public void promoteUser(User user) {
         if (user == null) {
-            statusMessage.set("Please select a user to promote.");
+            statusMessage.set("Please select a user to promote");
             return;
         }
         if (!currentUserIsMainAdmin()) {
-            statusMessage.set("Only the main admin can change user roles.");
+            statusMessage.set("Only the main admin can change user roles");
             return;
         }
         if (user instanceof Administrator) {
-            statusMessage.set("This user is already an administrator.");
+            statusMessage.set("This user is already an administrator");
             return;
         }
 
@@ -101,19 +101,19 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
 
     public void demoteUser(User user) {
         if (user == null) {
-            statusMessage.set("Please select a user to demote.");
+            statusMessage.set("Please select a user to demote");
             return;
         }
         if (!currentUserIsMainAdmin()) {
-            statusMessage.set("Only the main admin can change user roles.");
+            statusMessage.set("Only the main admin can change user roles");
             return;
         }
         if (MAIN_ADMIN_NAME.equals(user.getName())) {
-            statusMessage.set("The main admin account cannot be changed.");
+            statusMessage.set("The main admin account cannot be changed");
             return;
         }
         if (!(user instanceof Administrator)) {
-            statusMessage.set("This user is already a student.");
+            statusMessage.set("This user is already a student");
             return;
         }
 
@@ -123,7 +123,7 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
 
     public void deleteCourse(Course course) {
         if (course == null) {
-            statusMessage.set("Please select a course to delete.");
+            statusMessage.set("Please select a course to delete");
             return;
         }
 
@@ -193,39 +193,39 @@ public class AdminDashboardViewModel implements PropertyChangeListener {
                 List<User> receivedUsers = (List<User>) evt.getNewValue();
                 users.clear();
                 users.addAll(receivedUsers);
-                statusMessage.set("Admin data loaded.");
+                statusMessage.set("Admin data loaded");
             } else if ("CoursesRetrieved".equals(evt.getPropertyName())) {
                 List<Course> receivedCourses = (List<Course>) evt.getNewValue();
                 courses.clear();
                 courses.addAll(receivedCourses);
-                statusMessage.set("Admin data loaded.");
+                statusMessage.set("Admin data loaded");
             } else if ("AdminUserDeleted".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("User deleted successfully.");
+                    statusMessage.set("User deleted successfully");
                     refreshData();
                 } else {
-                    statusMessage.set("Failed to delete user.");
+                    statusMessage.set("Failed to delete user");
                 }
             } else if ("AdminCourseDeleted".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("Course deleted successfully.");
+                    statusMessage.set("Course deleted successfully");
                     refreshData();
                 } else {
-                    statusMessage.set("Failed to delete course.");
+                    statusMessage.set("Failed to delete course");
                 }
             } else if ("AdminUserPromoted".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("User promoted to administrator.");
+                    statusMessage.set("User promoted to administrator");
                     refreshData();
                 } else {
-                    statusMessage.set("Failed to promote user.");
+                    statusMessage.set("Failed to promote user");
                 }
             } else if ("AdminUserDemoted".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("User demoted to student.");
+                    statusMessage.set("User demoted to student");
                     refreshData();
                 } else {
-                    statusMessage.set("Failed to demote user.");
+                    statusMessage.set("Failed to demote user");
                 }
             }
         });

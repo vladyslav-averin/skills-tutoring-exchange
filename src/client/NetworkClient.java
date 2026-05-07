@@ -128,7 +128,7 @@ public class NetworkClient {
                         
                     } else if (incoming instanceof model.Notification) {
                         model.Notification notif = (model.Notification) incoming;
-                        model.fireEvent("NewNotification", null, notif);
+                        model.receiveNotification(notif);
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {

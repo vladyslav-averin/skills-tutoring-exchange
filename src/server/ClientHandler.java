@@ -233,7 +233,8 @@ public class ClientHandler implements Runnable {
                     // The sender already gets the normal "Direct message sent" response below.
                     if (directMessage.getReceiver() != null) {
                         Notification notification = new Notification("New Message",
-                                "New message from " + directMessage.getSender().getName() + ": " + directMessage.getText());
+                                directMessage.getSender().getName() + ": " + directMessage.getText(),
+                                directMessage.getSender().getName());
                         ServerMain.sendToUser(directMessage.getReceiver().getName(), notification);
                     }
                     return new Response(true, "Direct message sent", null);

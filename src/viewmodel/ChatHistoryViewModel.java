@@ -56,9 +56,9 @@ public class ChatHistoryViewModel implements PropertyChangeListener {
                 chatPartners.addAll(partners);
 
                 if (partners.isEmpty()) {
-                    statusMessage.set("No chat history yet.");
+                    statusMessage.set("No chat history yet");
                 } else {
-                    statusMessage.set("Chat history loaded.");
+                    statusMessage.set("Chat history loaded");
                 }
             }
         });

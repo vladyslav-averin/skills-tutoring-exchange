@@ -48,7 +48,8 @@ public class Chat implements Subject {
         this.chatHistory.add(message);
         
         Notification notification = new Notification("New Message", 
-            "New message from " + message.getSender().getName() + ": " + message.getText());
+            message.getSender().getName() + ": " + message.getText(),
+            message.getSender().getName());
         notifyObservers(notification);
     }
 

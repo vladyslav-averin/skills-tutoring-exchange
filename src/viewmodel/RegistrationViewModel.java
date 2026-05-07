@@ -34,7 +34,7 @@ public class RegistrationViewModel implements PropertyChangeListener {
 
     public void cancelRegistration(Course course) {
         if (course == null) {
-            statusMessage.set("Please select a registration to cancel.");
+            statusMessage.set("Please select a registration to cancel");
             return;
         }
 
@@ -59,17 +59,17 @@ public class RegistrationViewModel implements PropertyChangeListener {
                 registeredCourses.addAll(courses);
 
                 if (courses.isEmpty()) {
-                    statusMessage.set("No registrations yet.");
+                    statusMessage.set("No registrations yet");
                 } else {
-                    statusMessage.set("Registrations loaded.");
+                    statusMessage.set("Registrations loaded");
                 }
             } else if ("RegistrationCanceled".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("Registration canceled successfully.");
+                    statusMessage.set("Registration canceled successfully");
                     // Reload the list so the canceled course disappears.
                     refreshRegisteredCourses();
                 } else {
-                    statusMessage.set("Failed to cancel registration.");
+                    statusMessage.set("Failed to cancel registration");
                 }
             }
         });

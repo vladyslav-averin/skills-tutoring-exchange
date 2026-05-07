@@ -28,6 +28,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     private StringProperty newCourseInfo;
     private StringProperty newCourseTags;
     private StringProperty statusMessage;
+    private StringProperty notificationsButtonText;
     private BooleanProperty canEditSelectedCourse;
     private BooleanProperty canDeleteSelectedCourse;
     private BooleanProperty canEnrollSelectedCourse;
@@ -48,6 +49,7 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.newCourseInfo = new SimpleStringProperty("");
         this.newCourseTags = new SimpleStringProperty("");
         this.statusMessage = new SimpleStringProperty("");
+        this.notificationsButtonText = new SimpleStringProperty("Notifications");
         this.canEditSelectedCourse = new SimpleBooleanProperty(false);
         this.canDeleteSelectedCourse = new SimpleBooleanProperty(false);
         this.canEnrollSelectedCourse = new SimpleBooleanProperty(false);
@@ -66,6 +68,8 @@ public class DashboardViewModel implements PropertyChangeListener {
         this.model.addListener("RegisteredCoursesRetrieved", this);
         this.model.addListener("UserTagsUpdated", this);
         this.model.addListener("NewNotification", this);
+        this.model.addListener("NotificationsRead", this);
+        this.model.addListener("NotificationsCleared", this);
         
         // Fetch courses immediately when dashboard opens
         this.model.fetchCourses();
@@ -74,12 +78,12 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     public void addCourse() {
         if (newCourseName.get().isEmpty() || newCourseInfo.get().isEmpty()) {
-            statusMessage.set("Please fill in both course name and info.");
+            statusMessage.set("Please fill in both course name and info");
             return;
         }
         
         if (!(model.getCurrentUser() instanceof Student)) {
-            statusMessage.set("Only Students can add courses as Tutors.");
+            statusMessage.set("Only Students can add courses as Tutors");
             return;
         }
 
@@ -92,15 +96,15 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     public void deleteCourse(Course course) {
         if (course == null) {
-            statusMessage.set("Please select a course to delete.");
+            statusMessage.set("Please select a course to delete");
             return;
         }
         if (!(model.getCurrentUser() instanceof Student)) {
-            statusMessage.set("Only Students can delete their own courses.");
+            statusMessage.set("Only Students can delete their own courses");
             return;
         }
         if (course.getTutor() == null || !course.getTutor().getName().equals(model.getCurrentUser().getName())) {
-            statusMessage.set("You can only delete courses you created.");
+            statusMessage.set("You can only delete courses you created");
             return;
         }
 
@@ -110,19 +114,19 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     public void updateCourse(Course course, String newName, String newInformation, String newTags) {
         if (course == null) {
-            statusMessage.set("Please select a course to edit.");
+            statusMessage.set("Please select a course to edit");
             return;
         }
         if (newName.isEmpty() || newInformation.isEmpty()) {
-            statusMessage.set("Please fill in both course name and info.");
+            statusMessage.set("Please fill in both course name and info");
             return;
         }
         if (!(model.getCurrentUser() instanceof Student)) {
-            statusMessage.set("Only Students can edit their own courses.");
+            statusMessage.set("Only Students can edit their own courses");
             return;
         }
         if (course.getTutor() == null || !course.getTutor().getName().equals(model.getCurrentUser().getName())) {
-            statusMessage.set("You can only edit courses you created.");
+            statusMessage.set("You can only edit courses you created");
             return;
         }
 
@@ -150,6 +154,7 @@ public class DashboardViewModel implements PropertyChangeListener {
     public StringProperty newCourseInfoProperty() { return newCourseInfo; }
     public StringProperty newCourseTagsProperty() { return newCourseTags; }
     public StringProperty statusMessageProperty() { return statusMessage; }
+    public StringProperty notificationsButtonTextProperty() { return notificationsButtonText; }
     public BooleanProperty canEditSelectedCourseProperty() { return canEditSelectedCourse; }
     public BooleanProperty canDeleteSelectedCourseProperty() { return canDeleteSelectedCourse; }
     public BooleanProperty canEnrollSelectedCourseProperty() { return canEnrollSelectedCourse; }
@@ -170,6 +175,8 @@ public class DashboardViewModel implements PropertyChangeListener {
         model.removeListener("RegisteredCoursesRetrieved", this);
         model.removeListener("UserTagsUpdated", this);
         model.removeListener("NewNotification", this);
+        model.removeListener("NotificationsRead", this);
+        model.removeListener("NotificationsCleared", this);
     }
 
     public void setSelectedCourse(Course selectedCourse) {
@@ -179,11 +186,11 @@ public class DashboardViewModel implements PropertyChangeListener {
 
     public void enrollInCourse(Course course) {
         if (course == null) {
-            statusMessage.set("Please select a course to enroll in.");
+            statusMessage.set("Please select a course to enroll in");
             return;
         }
         if (!(model.getCurrentUser() instanceof Student)) {
-            statusMessage.set("Only Students can enroll in courses.");
+            statusMessage.set("Only Students can enroll in courses");
             return;
         }
         statusMessage.set("Enrolling in " + course.getName() + "...");
@@ -204,11 +211,11 @@ public class DashboardViewModel implements PropertyChangeListener {
         showCoursesWithMatchesFirst(filteredCourses);
 
         if (allCourses.isEmpty()) {
-            statusMessage.set("No courses available.");
+            statusMessage.set("No courses available");
         } else if (filteredCourses.isEmpty()) {
-            statusMessage.set("No courses found.");
+            statusMessage.set("No courses found");
         } else {
-            statusMessage.set("Courses updated.");
+            statusMessage.set("Courses updated");
         }
     }
 
@@ -300,21 +307,21 @@ public class DashboardViewModel implements PropertyChangeListener {
                     newCourseTags.set("");
                     model.fetchCourses(); // Refresh list automatically
                 } else {
-                    statusMessage.set("Failed to add course.");
+                    statusMessage.set("Failed to add course");
                 }
             } else if ("CourseDeleted".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Course deleted successfully!");
                     model.fetchCourses();
                 } else {
-                    statusMessage.set("Failed to delete course.");
+                    statusMessage.set("Failed to delete course");
                 }
             } else if ("CourseUpdated".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
                     statusMessage.set("Course updated successfully!");
                     model.fetchCourses();
                 } else {
-                    statusMessage.set("Failed to update course.");
+                    statusMessage.set("Failed to update course");
                 }
             } else if ("CourseEnrolled".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
@@ -342,17 +349,32 @@ public class DashboardViewModel implements PropertyChangeListener {
                 updateButtonState();
             } else if ("UserTagsUpdated".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    statusMessage.set("Your tags were saved.");
+                    statusMessage.set("Your tags were saved");
                     model.fetchCourses();
                 } else {
-                    statusMessage.set("Failed to save your tags.");
+                    statusMessage.set("Failed to save your tags");
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {
                 model.Notification notif = (model.Notification) evt.getNewValue();
-                // We could pop up an alert or add to a notification list
-                statusMessage.set("🔔 " + notif.getTitle() + ": " + notif.getMessageInformation());
+                // The newest notification is still shown here for quick feedback.
+                statusMessage.set("Notification - " + notif.getTitle() + ": " + notif.getMessageInformation());
+                updateNotificationsButtonText();
+            } else if ("NotificationsRead".equals(evt.getPropertyName())) {
+                updateNotificationsButtonText();
+            } else if ("NotificationsCleared".equals(evt.getPropertyName())) {
+                statusMessage.set("Notifications cleared");
+                updateNotificationsButtonText();
             }
         });
+    }
+
+    private void updateNotificationsButtonText() {
+        int count = model.getUnreadNotificationCount();
+        if (count == 0) {
+            notificationsButtonText.set("Notifications");
+        } else {
+            notificationsButtonText.set("Notifications (" + count + ")");
+        }
     }
 
     private void updateButtonState() {

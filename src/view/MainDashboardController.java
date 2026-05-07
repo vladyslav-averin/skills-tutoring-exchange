@@ -19,8 +19,8 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import viewmodel.ChatHistoryViewModel;
-import viewmodel.ChatViewModel;
 import viewmodel.DashboardViewModel;
+import viewmodel.NotificationViewModel;
 import viewmodel.RegistrationViewModel;
 import java.io.IOException;
 import java.util.Optional;
@@ -37,10 +37,12 @@ public class MainDashboardController {
     @FXML private Button deleteCourseButton;
     @FXML private Button editCourseButton;
     @FXML private Button enrollCourseButton;
+    @FXML private Button notificationsButton;
     @FXML private Label statusLabel;
 
     private DashboardViewModel viewModel;
     private Runnable onLogout;
+    private Stage notificationStage;
 
     public void init(DashboardViewModel viewModel) {
         this.viewModel = viewModel;
@@ -52,6 +54,7 @@ public class MainDashboardController {
         courseNameField.textProperty().bindBidirectional(viewModel.newCourseNameProperty());
         courseInfoField.textProperty().bindBidirectional(viewModel.newCourseInfoProperty());
         courseTagsField.textProperty().bindBidirectional(viewModel.newCourseTagsProperty());
+        notificationsButton.textProperty().bind(viewModel.notificationsButtonTextProperty());
         statusLabel.textProperty().bind(viewModel.statusMessageProperty());
         
         courseListView.setItems(viewModel.getCourseList());
@@ -183,6 +186,36 @@ public class MainDashboardController {
     }
 
     @FXML
+    public void onOpenNotificationsButton() {
+        viewModel.getModel().markAllNotificationsRead();
+
+        if (notificationStage != null && notificationStage.isShowing()) {
+            notificationStage.toFront();
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/NotificationView.fxml"));
+            Parent root = loader.load();
+
+            NotificationViewModel notificationViewModel = new NotificationViewModel(viewModel.getModel());
+            NotificationViewController controller = loader.getController();
+            controller.init(notificationViewModel);
+
+            notificationStage = new Stage();
+            notificationStage.setTitle("Notifications");
+            notificationStage.setScene(new Scene(root));
+            notificationStage.setOnHidden(event -> {
+                notificationViewModel.dispose();
+                notificationStage = null;
+            });
+            notificationStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     public void onOpenRegistrationsButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/RegistrationView.fxml"));
@@ -206,23 +239,7 @@ public class MainDashboardController {
             return;
         }
 
-        String tutorName = course.getTutor().getName();
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatView.fxml"));
-            Parent root = loader.load();
-
-            ChatViewModel chatViewModel = new ChatViewModel(viewModel.getModel(), course.getTutor(), "Chat with " + tutorName);
-            ChatViewController controller = loader.getController();
-            controller.init(chatViewModel);
-
-            Stage chatStage = new Stage();
-            chatStage.setTitle("Chat with " + tutorName);
-            chatStage.setScene(new Scene(root));
-            chatStage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ChatWindowManager.openChat(viewModel.getModel(), course.getTutor());
     }
 
     private ListCell<model.Course> createCourseCell() {

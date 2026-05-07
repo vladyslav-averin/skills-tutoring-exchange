@@ -34,7 +34,7 @@ public class LoginViewModel implements PropertyChangeListener {
 
     public void login() {
         if (usernameProperty.get().isEmpty() || passwordProperty.get().isEmpty()) {
-            showError("Please enter both username and password.");
+            showError("Please enter both username and password");
             return;
         }
         showInfo("Connecting...");
@@ -43,7 +43,7 @@ public class LoginViewModel implements PropertyChangeListener {
 
     public void registerStudent() {
         if (usernameProperty.get().isEmpty() || passwordProperty.get().isEmpty()) {
-            showError("Please enter both username and password to register.");
+            showError("Please enter both username and password to register");
             return;
         }
         showInfo("Registering...");
@@ -80,13 +80,13 @@ public class LoginViewModel implements PropertyChangeListener {
                         onLoginSuccess.run();
                     }
                 } else {
-                    showError("Invalid credentials. Try again.");
+                    showError("Invalid credentials. Try again");
                 }
             } else if ("RegisterResult".equals(evt.getPropertyName())) {
                 if ("SUCCESS".equals(evt.getNewValue())) {
-                    showSuccess("Registration Successful! You can now login.");
+                    showSuccess("Registration Successful! You can now login");
                 } else {
-                    showError("Registration Failed.");
+                    showError("Registration Failed");
                 }
             }
         });

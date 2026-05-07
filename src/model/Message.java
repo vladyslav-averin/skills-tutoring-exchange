@@ -1,9 +1,11 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.Serializable;
 
 public class Message implements Serializable {
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private User sender;
     private User receiver;
     private LocalDateTime timeStamp;
@@ -54,6 +56,6 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + timeStamp.toLocalTime() + "] " + sender.getName() + ": " + text;
+        return "[" + timeStamp.format(TIME_FORMATTER) + "] " + sender.getName() + ": " + text;
     }
 }

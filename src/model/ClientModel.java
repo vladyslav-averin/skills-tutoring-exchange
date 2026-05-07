@@ -5,14 +5,18 @@ import network.Request;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientModel {
     private NetworkClient networkClient;
     private User currentUser;
     private PropertyChangeSupport support;
+    private List<Notification> notificationHistory;
 
     public ClientModel() {
         this.support = new PropertyChangeSupport(this);
+        this.notificationHistory = new ArrayList<>();
         this.networkClient = new NetworkClient(this);
     }
 
@@ -103,6 +107,7 @@ public class ClientModel {
 
     public void logout() {
         currentUser = null;
+        clearNotifications();
     }
 
     public void setCurrentUser(User currentUser) {
@@ -111,6 +116,59 @@ public class ClientModel {
 
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    public void receiveNotification(Notification notification) {
+        synchronized (this) {
+            // Keep all notifications from this active session so the user can review them later.
+            notificationHistory.add(notification);
+        }
+        fireEvent("NewNotification", null, notification);
+    }
+
+    public synchronized List<Notification> getNotificationHistory() {
+        return new ArrayList<>(notificationHistory);
+    }
+
+    public synchronized int getUnreadNotificationCount() {
+        int count = 0;
+        for (Notification notification : notificationHistory) {
+            if (!notification.isRead()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void markAllNotificationsRead() {
+        synchronized (this) {
+            for (Notification notification : notificationHistory) {
+                notification.setRead(true);
+            }
+        }
+        fireEvent("NotificationsRead", null, null);
+    }
+
+    public void markNotificationsFromUserRead(String userName) {
+        if (userName == null || userName.trim().isEmpty()) {
+            return;
+        }
+
+        synchronized (this) {
+            for (Notification notification : notificationHistory) {
+                if (userName.equals(notification.getRelatedUserName())) {
+                    notification.setRead(true);
+                }
+            }
+        }
+        fireEvent("NotificationsRead", null, null);
+    }
+
+    public void clearNotifications() {
+        synchronized (this) {
+            notificationHistory.clear();
+        }
+        fireEvent("NotificationsCleared", null, null);
     }
 
     public void addListener(String eventName, PropertyChangeListener listener) {

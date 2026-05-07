@@ -26,7 +26,7 @@ public class ChatViewModel implements PropertyChangeListener {
         this.messageList = FXCollections.observableArrayList();
         this.messageInput = new SimpleStringProperty("");
         this.chatTitle = new SimpleStringProperty(chatTitle);
-        this.chatStatus = new SimpleStringProperty("Connected to " + chatTitle + ".");
+        this.chatStatus = new SimpleStringProperty("Connected to " + chatTitle);
 
         this.model.addListener("DirectChatHistoryRetrieved", this);
         this.model.addListener("DirectMessageSent", this);
@@ -40,7 +40,7 @@ public class ChatViewModel implements PropertyChangeListener {
             return;
         }
         if (chatPartner == null) {
-            chatStatus.set("No chat partner selected.");
+            chatStatus.set("No chat partner selected");
             return;
         }
         model.sendDirectMessage(chatPartner, messageInput.get());
@@ -58,6 +58,12 @@ public class ChatViewModel implements PropertyChangeListener {
     public StringProperty chatStatusProperty() { return chatStatus; }
     public StringProperty chatTitleProperty() { return chatTitle; }
 
+    public void dispose() {
+        model.removeListener("DirectChatHistoryRetrieved", this);
+        model.removeListener("DirectMessageSent", this);
+        model.removeListener("NewNotification", this);
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         javafx.application.Platform.runLater(() -> {
@@ -66,14 +72,14 @@ public class ChatViewModel implements PropertyChangeListener {
                     List<Message> history = (List<Message>) evt.getNewValue();
                     messageList.clear();
                     messageList.addAll(history);
-                    chatStatus.set("Direct chat history loaded.");
+                    chatStatus.set("Direct chat history loaded");
                 }
             } else if ("DirectMessageSent".equals(evt.getPropertyName())) {
                 if (chatPartner != null) {
                     if ("SUCCESS".equals(evt.getNewValue())) {
                         fetchHistory();
                     } else {
-                        chatStatus.set("Failed to send message.");
+                        chatStatus.set("Failed to send message");
                     }
                 }
             } else if ("NewNotification".equals(evt.getPropertyName())) {

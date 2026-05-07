@@ -13,7 +13,7 @@
 
 <BorderPane prefHeight="650.0" prefWidth="800.0" style="-fx-background-color: #f4f4f4;" stylesheets="@dashboard.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MainDashboardController">
    <top>
-      <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 15;" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50; -fx-padding: 10;" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="welcomeLabel" text="Welcome, User" textFill="WHITE">
                <font>
@@ -21,17 +21,22 @@
                </font>
             </Label>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" text="Chat History">
+            <Button fx:id="notificationsButton" mnemonicParsing="false" onAction="#onOpenNotificationsButton" style="-fx-background-color: #9b59b6; -fx-text-fill: white;" text="Notifications">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onOpenRegistrationsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="My Registrations">
+            <Button mnemonicParsing="false" onAction="#onOpenChatButton" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" text="Chats">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onRefreshButton" style="-fx-background-color: #34495e; -fx-text-fill: white;" text="Refresh Courses">
+            <Button mnemonicParsing="false" onAction="#onOpenRegistrationsButton" style="-fx-background-color: #16a085; -fx-text-fill: white;" text="Registrations">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onRefreshButton" style="-fx-background-color: #34495e; -fx-text-fill: white;" text="Refresh">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
